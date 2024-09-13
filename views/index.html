@@ -9,22 +9,28 @@
 </head>
 
 <body>
-    <header>
-        <h1>Contacts</h1>
-        <img src="../public/images/add-fab.png" alt="add a contact">
-        <img src="../public/images/search-icon.png" alt="search">
-    </header>
-    <main>
-
-    </main>
-    <ul>
-        <li>Adam Smith</li>
-        <li>Alex Frank</li>
-        <li>Alfred</li>
-        <li>Arthur Clark</li>
-        <li>Beatrice</li>
-        <li>Beyonce Smith</li>
-    </ul>
+    <section class="page">
+        <header roll="homepage-header" id="homepage-header">
+            <h1>Contacts</h1>
+            <img src="../public/images/add-fab.png" alt="add a contact">
+            <form roll="search-form" method="get">
+                <input type="text" id="search" name="q" placeholder="Search">
+                <button><img src="../public/images/search-icon.png" alt="search"></button>
+            </form>
+        </header>
+        <main>
+            <article>
+                <ul class ="contacts">
+                    <li><a href="contact/100001">Adam Smith</a></li>
+                    <li><a href="contact/100002">Alex Frank</a></li>
+                    <li><a href="contact/100003">Alfred</a></li>
+                    <li><a href="contact/100004">Arthur Clark</a></li>
+                    <li><a href="contact/100005">Beatrice</a></li>
+                    <li><a href="contact/100006">Beyonce Smith</a></li>
+                </ul>
+            </article>
+        </main>
+    </section>
 </body>
 
 </html>

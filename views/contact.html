@@ -9,19 +9,47 @@
 </head>
 
 <body>
-    <label for="collapse_contact">Collapse</label>
-    <input type="checkbox" id=collapse_contact>
+    <section class="page">
+        <a href="index.html">Contacts</a>
+        <label for="collapse_contact">Collapse</label>
+        <input type="checkbox" id=collapse_contact>
 
-    <label for="edit_contact">Edit</label>
-    <input type="checkbox" id=edit_contact>
-    <h2>Name: Alex Frank</h2>
-    <img src="../public/images/profiles/profile-alex-frank_.jpg" alt="alex frank profile">
-    <dl>
-        <dt>phone</dt>
-        <dd>1-888-867-5390</dd>
-        <dt>email</dt>
-        <dd>bitme@gmail.com</dd>
-    </dl>
+        <label for="edit_contact">Edit</label>
+        <input type="checkbox" id=edit_contact>
+        <h2>Name: Alex Frank</h2>
+        <img src="../public/images/profiles/profile-alex-frank_.jpg" alt="alex frank profile">
+        <dl>
+            <dt>phone</dt>
+            <dd>1-888-867-5390</dd>
+            <dt>email</dt>
+            <dd>bitme@gmail.com</dd>
+            <dt>note</dt>
+            <dd>He is the best, better than all the rest</dd>
+        </dl>
+
+        <section>
+            <form roll="edit-form" method="get">
+                <dl>
+                    <dt><label for="first_name">first name</label></dt>
+                    <dd><input type="text" id = "first_name" value="John"></dd>
+
+                    <dt><label for="last_name">last name</label></dt>
+                    <dd><input type="text" id = "last_name" value="Wick"></dd>
+
+                    <dt><label for="phone_number">phone number</label></dt>
+                    <dd><input type="text" id = "phone_number" value="867-5309"></dd>
+
+                    <dt><label for="email">email</label></dt>
+                    <dd><input type="email" id = "email" value="jwick@gmail.com"></dd>
+
+                    <dt><label for="note"></label>note</dt>
+                    <dd><input type="textarea" id="note" value="no one messes with john wick!"></dd>
+                </dl>
+                <button>Save</button>
+                <button>Cancel</button>
+            </form>
+    </section>
+
 </body>
 
 </html>
