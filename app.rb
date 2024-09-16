@@ -18,6 +18,25 @@ def page_title_tag(title:"", delimiter:"-", app_name:@app_name)
   "#{app_name} #{delimiter} #{title}"
 end
 
+#######################################
+# Pages
+#######################################
+
+def load_contact_page
+  @path_info = request.path_info
+  @edit_action = "#{@path_info}/edit"
+  @delete_action = "#{@path_info}/delete"
+  # @path_info = params['slug']
+  # @path_slug = params['contact_id']
+  @page_title_tag = page_title_tag(title:"contact")
+  erb :contact, :layout => :layout
+end
+
+def load_all_contacts_page
+  @page_title_tag = page_title_tag(title:"home")
+  erb :index, :layout => :layout
+end
+
 
 #######################################
 # Routes
@@ -27,24 +46,44 @@ get '/' do
   redirect to('/contacts')
 end
 
+# Get All Contacts
 get '/contacts' do
-  @page_title_tag = page_title_tag(title:"home")
-  erb :index, :layout => :layout
+  load_all_contacts_page
 end
 
-get '/contacts/:slug' do
-  @path_info = request.path_info
-  @path_info = params['slug']
-  @page_title_tag = page_title_tag(title:"contact")
-  @page_title_tag = page_title_tag(title:"</title><script>alert('evil')</script>")
-  erb :contact, :layout => :layout
+# Add a new contact
+post '/contacts' do
+  load_all_contacts_page
 end
 
-# https://www.reddit.com/r/webdev/comments/194uuru/best_structure_for_api_urls/
-post '/contacts/new' do
-  erb :index, :layout => :layout
+# Get contact details
+get '/contacts/:contact_id' do
+  load_contact_page
 end
 
-post '/contacts/contact_id/{contact_id}/edit' do
-  # erb "hit!"
+# Update contact details
+post '/contacts/:contact_id' do
+  load_contact_page
 end
+
+# Delete an existing contact
+post '/contacts/:contact_id/delete' do
+  load_all_contacts_page
+end
+
+# Refreshes after delete revert the url to the main contacts listing page
+get '/contacts/:contact_id/delete' do
+  redirect to('/contacts')
+end
+
+
+# Update an existing contact
+# post '/contacts/:contact_id/edit' do
+#   erb :contact, :layout => :layout
+# end
+
+# Refreshes after edit the url to the contacts page
+# get '/contacts/:contact_id/edit' do
+#   @path_slug = params['contact_id']
+#   redirect to("/contacts/#{params['contact_id']}")
+# end

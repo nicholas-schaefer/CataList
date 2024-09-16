@@ -95,6 +95,12 @@ a   {
     max-height: 70%;
 }
 
+#delete-button{
+    color: red;
+    display: block;
+    margin-top: 15px;
+}
+
 button {
     min-width: 30px;
     cursor: var(--link-cursor);
@@ -157,7 +163,7 @@ h6 {
     top: 0;
     right: 0;
     left: 0;
-    bottom: 0;
+    bottom: -200px;
     height: auto;
 
     background-color:rgba(0, 0, 0, 0.5);

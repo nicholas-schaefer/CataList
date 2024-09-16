@@ -26,7 +26,7 @@
     <input type="checkbox" id=edit_contact class="hidden">
     <section class="modal">
         <article roll="edit-form-wrapper">
-            <form roll="edit-form" method="get">
+            <form roll="edit-form" method="post">
                 <dl>
                     <dt><label for="profile_pic">Update profile picture:</label></dt>
                     <dd><input type="file" id="profile_pic" name="profile_pic" accept="image/png, image/jpeg"
@@ -48,6 +48,7 @@
                     <dd><textarea id="note" name="note">no one messes with john wick!</textarea></dd>
                 </dl>
                 <button>Update Contact</button><label for="edit_contact" roll="link" id="cancel-link">Cancel</label>
+                <button formaction="<%=@delete_action%>" id="delete-button">delete this contact</button>
             </form>
         </article>
     </section>
