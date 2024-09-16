@@ -2,7 +2,7 @@
     <header>
         <nav class="contacts_menu">
             <ul>
-                <li><a href="/">Contacts</a></li>
+                <li><a href="/contacts">Contacts</a></li>
                 <li><label for="edit_contact" roll="link">Edit</label></li>
             </ul>
         </nav>
@@ -11,6 +11,8 @@
     <article>
         <img src="/images/profiles/profile-alex-frank_.jpg" alt="alex frank profile">
         <dl>
+            <dt>url slug</dt>
+            <dd><%=@path_info%></dd>
             <dt>id</dt>
             <dd>100002</dd>
             <dt>phone</dt>

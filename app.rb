@@ -1,26 +1,42 @@
 require 'sinatra'
 require "sinatra/reloader" if development?
 
+configure do
+  set :erb, :escape_html => true
+end
+
 helpers do
-  def page_title_tag(title="", delimiter="-")
-    return APP_TITLE if title.empty?
-    "#{APP_NAME} #{delimiter} #{title}"
-  end
+
 end
 
 before do
-  @app_name = "cat contacts"
-  @title ||= ""
+  @app_name ||= "cat contacts"
+end
+
+def page_title_tag(title:"", delimiter:"-", app_name:@app_name)
+  return app_name if title.empty?
+  "#{app_name} #{delimiter} #{title}"
 end
 
 
+#######################################
+# Routes
+#######################################
+
 get '/' do
-  @page_title_tag = page_title_tag
-  # '<strong>Hello World</strong>'
+  redirect to('/contacts')
+end
+
+get '/contacts' do
+  @page_title_tag = page_title_tag(title:"home")
   erb :index, :layout => :layout
 end
 
-get '/contact/:slug' do
+get '/contacts/:slug' do
+  @path_info = request.path_info
+  @path_info = params['slug']
+  @page_title_tag = page_title_tag(title:"contact")
+  @page_title_tag = page_title_tag(title:"</title><script>alert('evil')</script>")
   erb :contact, :layout => :layout
 end
 
