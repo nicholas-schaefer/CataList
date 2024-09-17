@@ -7,6 +7,7 @@ gem "sinatra-contrib"
 gem "erubis"
 gem "webrick"
 gem "pry"
+gem 'pg', '~> 1.5', '>= 1.5.6'
 
 group :production do
   gem "puma"

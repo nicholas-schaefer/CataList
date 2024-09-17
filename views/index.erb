@@ -13,13 +13,23 @@
     <main>
         <article>
             <ul class="contacts">
-                <li><a href="contact/100001">Adam Smith</a></li>
-                <li><a href="contact/100002">Alex Frank</a></li>
-                <li><a href="contact/100003">Alfred</a></li>
-                <li><a href="contact/100004">Arthur Clark</a></li>
-                <li><a href="contact/100005">Beatrice</a></li>
-                <li><a href="contact/100006">Beyonce Smith</a></li>
+                <% @result.each do |tuple|%>
+                    <% link_to_contact=@path_info + "/" + tuple["id"] %>
+                    <li>
+                        <a href="<%= link_to_contact %>">
+                            <%= full_name(first_name: tuple["first_name"], last_name: tuple["last_name"])%>
+                        </a>
+                    </li>
+                <% end %>
             </ul>
+            <ul class="contacts">
+            <li><a href="contact/100001">Adam Smith</a></li>
+            <li><a href="contact/100002">Alex Frank</a></li>
+            <li><a href="contact/100003">Alfred</a></li>
+            <li><a href="contact/100004">Arthur Clark</a></li>
+            <li><a href="contact/100005">Beatrice</a></li>
+            <li><a href="contact/100006">Beyonce Smith</a></li>
+        </ul>
         </article>
     </main>
     <input type="checkbox" id=edit_contact class="hidden">
