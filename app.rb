@@ -1,5 +1,4 @@
 require 'sinatra'
-require "sinatra/reloader" if development?
 require 'pg'
 require 'pry'
 
@@ -7,7 +6,11 @@ require_relative 'database_persistence'
 
 configure do
   set :erb, :escape_html => true
-  also_reload '/database_persistence.rb'
+end
+
+configure(:development) do
+  require "sinatra/reloader"
+  also_reload "database_persistence.rb"
 end
 
 helpers do
@@ -26,20 +29,22 @@ before do
 end
 
 def query_select_all_results
-  sql = <<~SQL
-      SELECT * FROM contacts
-      ORDER BY first_name, last_name
-      LIMIT 5;
-  SQL
-  result = @storage.query(sql)
+  # sql = <<~SQL
+  #     SELECT * FROM contacts
+  #     ORDER BY first_name, last_name
+  #     LIMIT 5;
+  # SQL
+  # result = @storage.query(sql)
+  @storage.find_all_contacts
 end
 
 def query_select_one_result(contact_id)
-  sql = <<~SQL
-      SELECT * FROM contacts
-      WHERE id = $1;
-  SQL
-  result = @storage.query(sql, contact_id)
+  # sql = <<~SQL
+  #     SELECT * FROM contacts
+  #     WHERE id = $1;
+  # SQL
+  # result = @storage.query(sql, contact_id)
+  @storage.find_contact(contact_id)
 end
 
 def page_title_tag(title:"", delimiter:"-", app_name:@app_name)

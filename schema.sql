@@ -49,12 +49,18 @@
 /*
     Get all the contacts
 */
-SELECT * FROM contacts
-    ORDER BY first_name, last_name;
+-- SELECT * FROM contacts
+--     ORDER BY first_name, last_name;
 
 /*
     Get the contacts
 */
-SELECT first_name, last_name FROM contacts
-    ORDER BY first_name, last_name
-    LIMIT 5;
+-- SELECT first_name, last_name FROM contacts
+--     ORDER BY first_name, last_name
+--     LIMIT 5;
+
+/*
+    Sort by full name
+*/
+SELECT *, concat_ws(' ', first_name, last_name) AS full_name FROM contacts
+    ORDER BY full_name;
