@@ -79,9 +79,10 @@ def load_all_contacts_page
   halt 404 unless @pages.any?(pagination_requested.to_i) #need different error, means page not in range
 
   @validated_pagination_int = pagination_requested.to_i
+  pagination_offset = (@validated_pagination_int - 1)* @pagination_item_limit
 
-
-  @contacts = query_select_all_results
+  # @contacts = query_select_all_results
+  @contacts = @storage.find_selected_contacts(limit: @pagination_item_limit, offset:pagination_offset)
   @path_info = request.path_info
   @page_title_tag = page_title_tag(title:"home")
   erb :index, :layout => :layout
