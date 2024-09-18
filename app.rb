@@ -29,21 +29,10 @@ before do
 end
 
 def query_select_all_results
-  # sql = <<~SQL
-  #     SELECT * FROM contacts
-  #     ORDER BY first_name, last_name
-  #     LIMIT 5;
-  # SQL
-  # result = @storage.query(sql)
   @storage.find_all_contacts
 end
 
 def query_select_one_result(contact_id)
-  # sql = <<~SQL
-  #     SELECT * FROM contacts
-  #     WHERE id = $1;
-  # SQL
-  # result = @storage.query(sql, contact_id)
   @storage.find_contact(contact_id)
 end
 
@@ -114,6 +103,9 @@ def load_contact_page
 end
 
 def load_all_contacts_page
+  pagination_requested = params['page'] || '1'
+  halt 404 unless @storage.string_also_an_integer?(pagination_requested) #lazy, need error message rewrite, helper class?
+
   @path_info = request.path_info
   @page_title_tag = page_title_tag(title:"home")
   erb :index, :layout => :layout

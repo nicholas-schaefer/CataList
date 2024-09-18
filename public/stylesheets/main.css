@@ -203,6 +203,10 @@ textarea {
     width: 10em;
 }
 
+.pagination ul li {
+    display: inline;
+}
+
 @media screen and (min-width: 680px) {
     #homepage-header {
         /* background-color: purple; */

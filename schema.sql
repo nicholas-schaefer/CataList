@@ -64,3 +64,17 @@
 */
 SELECT *, concat_ws(' ', first_name, last_name) AS full_name FROM contacts
     ORDER BY full_name;
+
+/*
+    Limits and ofsetts
+*/
+-- SELECT *, concat_ws(' ', first_name, last_name) AS full_name FROM contacts
+--     ORDER BY full_name
+--     LIMIT 4
+--     OFFSET 1
+
+
+/*
+    count of rows in the database
+*/
+SELECT count(*) AS contacts_count FROM contacts;
