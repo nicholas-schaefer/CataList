@@ -8,28 +8,49 @@ end
 
 helpers do
   def full_name(first_name:"", last_name:"")
+    first_name&.capitalize!
+    last_name&.capitalize!
     [first_name, last_name].join(" ")
   end
 end
 
 before do
   @app_name ||= "cat contacts"
-  @result ||= query1
+  @result ||= query_select_all_results
 end
 
-def query1
+def query_select_all_results
   conn = PG.connect(dbname: "cat_contacts")
   sql = <<~SQL
-      SELECT id, first_name, last_name FROM contacts
+      SELECT * FROM contacts
       ORDER BY first_name, last_name
       LIMIT 5;
   SQL
   result = conn.exec(sql)
 end
 
+def query_select_one_result(contact_id)
+  conn = PG.connect(dbname: "cat_contacts")
+  # id = '6b5da871-b2d8-4fc8-930c-b3866355e7be'
+  sql = <<~SQL
+      SELECT * FROM contacts
+      WHERE id = $1;
+  SQL
+  # result = conn.exec(sql)
+  result = conn.exec_params(sql, [contact_id] )
+end
+
 def page_title_tag(title:"", delimiter:"-", app_name:@app_name)
   return app_name if title.empty?
   "#{app_name} #{delimiter} #{title}"
+end
+
+
+## Methods in spired by https://stackoverflow.com/a/47511286
+def validate_uuid_format(uuid)
+  uuid_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+  return true if uuid_regex.match?(uuid.to_s.downcase)
+  # log_and_raise_error("Given argument is not a valid UUID: '#{format_argument_output(uuid)}'")
 end
 
 #######################################
@@ -69,12 +90,21 @@ end
 #######################################
 
 def load_contact_page
+  ## next to do, figure out ntuples and if it is 0 throw  404
+  unless validate_uuid_format(params['contact_id'])
+    halt 404
+  end
+  @path_slug = params['contact_id']
   @path_info = request.path_info
   @edit_action = "#{@path_info}/edit"
   @delete_action = "#{@path_info}/delete"
   # @path_info = params['slug']
-  # @path_slug = params['contact_id']
   @page_title_tag = page_title_tag(title:"contact")
+
+  result = query_select_one_result(params['contact_id'])
+  @contact = result.first
+
+
   erb :contact, :layout => :layout
 end
 
@@ -122,6 +152,12 @@ end
 get '/contacts/:contact_id/delete' do
   redirect to('/contacts')
 end
+
+# When there's a 404 error this is what happens
+not_found do
+  erb :page_not_found, :layout => :layout
+end
+
 
 
 # Update an existing contact

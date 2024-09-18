@@ -6,21 +6,25 @@
                 <li><label for="edit_contact" roll="link">Edit</label></li>
             </ul>
         </nav>
-        <h2>Name: Alex Frank</h2>
+        <h2>Name: <%= full_name(first_name: @contact["first_name"], last_name: @contact["last_name"])%></h2>
     </header>
     <article>
         <img src="/images/profiles/profile-alex-frank_.jpg" alt="alex frank profile">
         <dl>
+            <dt>query test</dt>
+            <dd><%=@contact%></dd>
             <dt>url slug</dt>
+            <dd><%=@path_slug%></dd>
+            <dt>url path</dt>
             <dd><%=@path_info%></dd>
             <dt>id</dt>
-            <dd>100002</dd>
+            <dd><%=@contact["id"]%></dd>
             <dt>phone</dt>
-            <dd>1-888-867-5390</dd>
+            <dd><%=@contact["phone"]%></dd>
             <dt>email</dt>
-            <dd>biteme@gmail.com</dd>
+            <dd><%=@contact["email"]%></dd>
             <dt>note</dt>
-            <dd>He is the best, better than all the rest</dd>
+            <dd><%=@contact["note"]%></dd>
         </dl>
     </article>
     <input type="checkbox" id=edit_contact class="hidden">
