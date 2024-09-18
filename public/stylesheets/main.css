@@ -3,6 +3,8 @@
 :root {
     --main-padding: 10px;
 
+    --primary-text-color: rgb(0, 0, 0);
+
     --link-color: #0066cc;
     --link-cursor: pointer;
     --link-text-decoration: none;
@@ -19,6 +21,7 @@ body {
     background-color: lightyellow;
     display: flex;
     justify-content: center;
+    color: var(--primary-text-color)
 }
 
 a   {
@@ -205,6 +208,13 @@ textarea {
 
 .pagination ul li {
     display: inline;
+}
+
+.pagination a.active {
+    pointer-events: none;
+    cursor: default;
+    color: var(--primary-text-color);
+    text-decoration: underline;
 }
 
 @media screen and (min-width: 680px) {

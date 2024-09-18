@@ -23,9 +23,8 @@ end
 
 before do
   @storage ||= DatabasePersistence.new(logger: logger)
-  @result ||= query_select_all_results
-
   @app_name ||= "cat contacts"
+  @pagination_item_limit = 3
 end
 
 def query_select_all_results
@@ -50,38 +49,6 @@ def valid_uuid_format?(uuid)
 end
 
 #######################################
-# Database TESTING
-#######################################
-# conn = PG.connect(dbname: "cat_contacts")
-# sql = <<~SQL
-#     SELECT first_name, last_name FROM contacts
-#     ORDER BY first_name, last_name
-#     LIMIT 5;
-# SQL
-# result = conn.exec(sql)
-# result.each do |row|
-#   puts row
-# end
-
-# {
-#   "id"=>"a6351a03-5345-4946-8e36-5f4adecb073f",
-#   "first_name"=>"beyonce",
-#   "last_name"=>nil,
-#   "phone"=>"999-999-9999",
-#   "email"=>"biteme@gmail.com",
-#   "note"=>"here I am"
-# }
-
-
-
-
-
-
-
-
-
-
-#######################################
 # Pages
 #######################################
 
@@ -103,9 +70,18 @@ def load_contact_page
 end
 
 def load_all_contacts_page
+  total_contacts_count = @storage.contacts_total_count
+  total_pages = total_contacts_count/@pagination_item_limit + 1
+  @pages = (1..total_pages).to_a
+
   pagination_requested = params['page'] || '1'
   halt 404 unless @storage.string_also_an_integer?(pagination_requested) #lazy, need error message rewrite, helper class?
+  halt 404 unless @pages.any?(pagination_requested.to_i) #need different error, means page not in range
 
+  @validated_pagination_int = pagination_requested.to_i
+
+
+  @contacts = query_select_all_results
   @path_info = request.path_info
   @page_title_tag = page_title_tag(title:"home")
   erb :index, :layout => :layout
