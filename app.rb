@@ -3,8 +3,11 @@ require "sinatra/reloader" if development?
 require 'pg'
 require 'pry'
 
+require_relative 'database_persistence'
+
 configure do
   set :erb, :escape_html => true
+  also_reload '/database_persistence.rb'
 end
 
 helpers do
@@ -16,29 +19,27 @@ helpers do
 end
 
 before do
-  @app_name ||= "cat contacts"
+  @storage ||= DatabasePersistence.new(logger: logger)
   @result ||= query_select_all_results
+
+  @app_name ||= "cat contacts"
 end
 
 def query_select_all_results
-  conn = PG.connect(dbname: "cat_contacts")
   sql = <<~SQL
       SELECT * FROM contacts
       ORDER BY first_name, last_name
       LIMIT 5;
   SQL
-  result = conn.exec(sql)
+  result = @storage.query(sql)
 end
 
 def query_select_one_result(contact_id)
-  conn = PG.connect(dbname: "cat_contacts")
-  # id = '6b5da871-b2d8-4fc8-930c-b3866355e7be'
   sql = <<~SQL
       SELECT * FROM contacts
       WHERE id = $1;
   SQL
-  # result = conn.exec(sql)
-  result = conn.exec_params(sql, [contact_id] )
+  result = @storage.query(sql, contact_id)
 end
 
 def page_title_tag(title:"", delimiter:"-", app_name:@app_name)
