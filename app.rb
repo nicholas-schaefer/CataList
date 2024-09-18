@@ -1,6 +1,7 @@
 require 'sinatra'
 require "sinatra/reloader" if development?
 require 'pg'
+require 'pry'
 
 configure do
   set :erb, :escape_html => true
@@ -47,7 +48,7 @@ end
 
 
 ## Methods in spired by https://stackoverflow.com/a/47511286
-def validate_uuid_format(uuid)
+def valid_uuid_format?(uuid)
   uuid_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   return true if uuid_regex.match?(uuid.to_s.downcase)
   # log_and_raise_error("Given argument is not a valid UUID: '#{format_argument_output(uuid)}'")
@@ -90,20 +91,18 @@ end
 #######################################
 
 def load_contact_page
-  ## next to do, figure out ntuples and if it is 0 throw  404
-  unless validate_uuid_format(params['contact_id'])
-    halt 404
-  end
+  halt 404 unless valid_uuid_format?(params['contact_id'])
+
+  result = query_select_one_result(params['contact_id'])
+  halt 404 unless result.ntuples == 1
+
+  @contact = result.first
   @path_slug = params['contact_id']
   @path_info = request.path_info
   @edit_action = "#{@path_info}/edit"
   @delete_action = "#{@path_info}/delete"
   # @path_info = params['slug']
   @page_title_tag = page_title_tag(title:"contact")
-
-  result = query_select_one_result(params['contact_id'])
-  @contact = result.first
-
 
   erb :contact, :layout => :layout
 end
