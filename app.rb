@@ -25,6 +25,8 @@ before do
   @storage ||= DatabasePersistence.new(logger: logger)
   @app_name ||= "cat contacts"
   @pagination_item_limit = 3
+  @request_errors ||= []
+  # @request_errors = ["too lazy", "to tired", "need to get good"]
 end
 
 def query_select_all_results
@@ -69,7 +71,8 @@ def load_contact_page
   erb :contact, :layout => :layout
 end
 
-def load_all_contacts_page
+def load_all_contacts_page(error: nil)
+  # @request_errors = ["too lazy", "to tired", "need to get good"]
   total_contacts_count = @storage.contacts_total_count
   total_pages = total_contacts_count/@pagination_item_limit + 1
   @pages = (1..total_pages).to_a
@@ -104,20 +107,33 @@ end
 
 # Add a new contact
 post '/contacts' do
+  # erb "<p>something happened!</p>"
+
   first_name =  params['first_name'].strip.downcase #for sorting, should also have db trigger
   last_name = params['last_name'].strip.downcase #see above, (too much work!)
   phone_number = params['phone_number'].strip
   email = params['email'].strip
   note = params['note'].strip
-
-  @storage.add_contact(
-    first_name: first_name,
-    last_name: last_name,
-    phone_number: phone_number,
-    email: email,
-    note: note)
-  # erb "<p>something happened!</p>"
-  load_all_contacts_page
+  begin
+    @storage.add_contact(
+      first_name: first_name,
+      last_name: last_name,
+      phone_number: phone_number,
+      email: email,
+      note: note)
+  rescue StandardError => e
+    # erb "<p>database rejected entry for some reason</p> <p>#{e.message}</p>"
+    # @request_errors << e.message
+    regex = /violates check constraint "need_a_name"/
+    if !!(regex =~ e.message)
+      @request_errors << "Both first name and last name cannot be empty"
+    else
+      @request_errors << "Unspecified problem"
+    end
+    load_all_contacts_page(error: e)
+  else
+    load_all_contacts_page(error: nil)
+  end
 end
 
 # Get contact details

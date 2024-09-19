@@ -43,6 +43,12 @@
     <input type="checkbox" id=edit_contact class="hidden">
     <section class="modal">
         <article roll="edit-form-wrapper">
+            <section class="<%= @request_errors.empty? ? 'errors hidden' : 'errors' %>">
+                <h2>Database errors:</h2>
+                <% @request_errors.each do |error_message| %>
+                    <p><%= error_message %></p>
+                <% end %>
+            </section>
             <form roll="edit-form" method="post" name="add-contact" action="/contacts">
                 <dl>
                     <dt><label for="profile_pic">Update profile picture:</label></dt>

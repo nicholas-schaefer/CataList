@@ -217,6 +217,12 @@ textarea {
     text-decoration: underline;
 }
 
+.errors {
+    border: 1px solid black;
+    background-color: lightcoral;
+    background-color: lightyellow;
+}
+
 @media screen and (min-width: 680px) {
     #homepage-header {
         /* background-color: purple; */
