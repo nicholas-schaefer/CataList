@@ -5,9 +5,12 @@ class DatabasePersistence
     @logger = logger
   end
 
-  def query(statement, *params)
-    @logger.info "#{statement}: #{params}"
-    @db.exec_params(statement, params)
+  def add_contact(first_name:, last_name:, phone_number:, email:, note: )
+    sql = <<~SQL
+    INSERT INTO contacts(first_name, last_name, phone, email, note)
+    VALUES              ($1,         $2,        $3,    $4,    $5)
+    SQL
+    query(sql, first_name, last_name, phone_number, email, note)
   end
 
   def find_contact(contact_id)
@@ -44,6 +47,13 @@ class DatabasePersistence
   def string_also_an_integer?(input)
     regex = /^\d+$/
     !!(regex =~ input)
+  end
+
+  private
+
+  def query(statement, *params)
+    @logger.info "#{statement}: #{params}"
+    @db.exec_params(statement, params)
   end
 
 end

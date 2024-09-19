@@ -6,7 +6,6 @@
 -- SELECT 'CREATE DATABASE cat_contacts'
 -- WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'cat_contacts')\gexec
 
-
 /*
     Create Table
 */
@@ -22,7 +21,10 @@
 --     email varchar(250),
 --     note varchar(250),
 --     PRIMARY KEY (id),
---     CONSTRAINT need_a_name CHECK (num_nonnulls(first_name, last_name) >= 1)
+--     CONSTRAINT need_a_name CHECK (
+--         num_nonnulls(first_name, last_name) >= 1 AND
+--         NOT (TRIM(first_name) = '' AND TRIM(last_name) = '')
+--         )
 -- );
 
 /*
@@ -42,9 +44,13 @@
 --                     ('zaha',        null,           '010-999-9999',    'zaha@aol.com',      'he would be friends with zinedane serial winner');
 
 
+-- INSERT INTO contacts(first_name,    last_name,      phone,             email,              note)
+--     VALUES          (' ',        '',        '001-999-9999',    'asmith@aol.com',    'he likes long walks on the beach');
+
+
 -- \d contacts
 
--- SELECT * FROM contacts;
+SELECT * FROM contacts;
 
 /*
     Get all the contacts
@@ -62,8 +68,8 @@
 /*
     Sort by full name
 */
-SELECT *, concat_ws(' ', first_name, last_name) AS full_name FROM contacts
-    ORDER BY full_name;
+-- SELECT *, concat_ws(' ', first_name, last_name) AS full_name FROM contacts
+--     ORDER BY full_name;
 
 /*
     Limits and ofsetts
@@ -77,4 +83,23 @@ SELECT *, concat_ws(' ', first_name, last_name) AS full_name FROM contacts
 /*
     count of rows in the database
 */
-SELECT count(*) AS contacts_count FROM contacts;
+-- SELECT count(*) AS contacts_count FROM contacts;
+
+-- SELECT last_name, length(last_name) FROM contacts
+--     WHERE id = '61f1a1ea-780d-4263-9554-6e4118a19640';
+
+-- SELECT ''::char(5) = ''::char(5)     AS eq1
+--      , ''::char(5) = '  '::char(5)   AS eq2
+--      , ''::char(5) = '    '::char(5) AS eq3;
+
+-- ALTER TABLE contacts DROP CONSTRAINT need_a_name;
+
+
+
+
+-- ALTER TABLE contacts
+-- ADD CONSTRAINT need_a_name
+-- CHECK (
+--     num_nonnulls(first_name, last_name) >= 1 AND
+--     NOT (TRIM(first_name) = '' AND TRIM(last_name) = '')
+-- );

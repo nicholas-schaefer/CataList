@@ -104,7 +104,20 @@ end
 
 # Add a new contact
 post '/contacts' do
-  load_all_contacts_page
+  first_name =  params['first_name'].strip.downcase #for sorting, should also have db trigger
+  last_name = params['last_name'].strip.downcase #see above, (too much work!)
+  phone_number = params['phone_number'].strip
+  email = params['email'].strip
+  note = params['note'].strip
+
+  @storage.add_contact(
+    first_name: first_name,
+    last_name: last_name,
+    phone_number: phone_number,
+    email: email,
+    note: note)
+  erb "<p>something happened!</p>"
+  # load_all_contacts_page
 end
 
 # Get contact details
