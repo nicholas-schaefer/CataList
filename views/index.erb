@@ -40,7 +40,7 @@
             </ul>
         </nav>
     </footer>
-    <input type="checkbox" id=edit_contact class="hidden">
+    <input type="checkbox" id="edit_contact" class="hidden" <%= @request_errors.empty? ? '' : 'checked' %>>
     <section class="modal">
         <article roll="edit-form-wrapper">
             <section class="<%= @request_errors.empty? ? 'errors hidden' : 'errors' %>">
@@ -56,19 +56,19 @@
                             size="2097152"></dd>
 
                     <dt><label for="first_name">first name</label></dt>
-                    <dd><input type="text" maxlength="250" id="first_name" name="first_name" value="John"></dd>
+                    <dd><input type="text" maxlength="250" id="first_name" name="first_name" value="<%= @add_contact_form[:first_name]%>"></dd>
 
                     <dt><label for="last_name">last name</label></dt>
-                    <dd><input type="text" maxlength="250" id="last_name" name="last_name" value="Wick"></dd>
+                    <dd><input type="text" maxlength="250" id="last_name" name="last_name" value="<%= @add_contact_form[:last_name]%>"></dd>
 
                     <dt><label for="phone_number">phone number</label></dt>
-                    <dd><input type="text" maxlength="30"id="phone_number" name="phone_number" value="867-5309"></dd>
+                    <dd><input type="text" maxlength="30"id="phone_number" name="phone_number" value="<%= @add_contact_form[:phone_number]%>"></dd>
 
                     <dt><label for="email">email</label></dt>
-                    <dd><input type="email" maxlength="250" id="email" name="email" value="jwick@gmail.com"></dd>
+                    <dd><input type="email" maxlength="250" id="email" name="email" value="<%= @add_contact_form[:email]%>"></dd>
 
                     <dt><label for="note"></label>note</dt>
-                    <dd><textarea id="note" maxlength="250" name="note">no one messes with john wick!</textarea></dd>
+                    <dd><textarea id="note" maxlength="250" name="note"><%= @add_contact_form[:note]%></textarea></dd>
                 </dl>
                 <button>Create Contact</button><label for="edit_contact" roll="link" id="cancel-link">Cancel</label>
             </form>

@@ -26,7 +26,13 @@ before do
   @app_name ||= "cat contacts"
   @pagination_item_limit = 3
   @request_errors ||= []
-  # @request_errors = ["too lazy", "to tired", "need to get good"]
+  @add_contact_form ||= {
+    first_name: "John",
+    last_name: "Wick",
+    phone_number: "867-5309",
+    email: "jwick@gmail.com",
+    note: "no one messes with john wick!"
+  }
 end
 
 def query_select_all_results
@@ -71,7 +77,7 @@ def load_contact_page
   erb :contact, :layout => :layout
 end
 
-def load_all_contacts_page(error: nil)
+def load_all_contacts_page
   # @request_errors = ["too lazy", "to tired", "need to get good"]
   total_contacts_count = @storage.contacts_total_count
   total_pages = total_contacts_count/@pagination_item_limit + 1
@@ -88,6 +94,7 @@ def load_all_contacts_page(error: nil)
   @contacts = @storage.find_selected_contacts(limit: @pagination_item_limit, offset:pagination_offset)
   @path_info = request.path_info
   @page_title_tag = page_title_tag(title:"home")
+
   erb :index, :layout => :layout
 end
 
@@ -128,11 +135,18 @@ post '/contacts' do
     if !!(regex =~ e.message)
       @request_errors << "Both first name and last name cannot be empty"
     else
-      @request_errors << "Unspecified problem"
+      @request_errors << "Unspecified problem - Are you sending post requests outside the form - don't!!!!!"
     end
-    load_all_contacts_page(error: e)
+    @add_contact_form = {
+      first_name: first_name,
+      last_name: last_name,
+      phone_number: phone_number,
+      email: email,
+      note: note
+    }
+    load_all_contacts_page
   else
-    load_all_contacts_page(error: nil)
+    load_all_contacts_page
   end
 end
 
