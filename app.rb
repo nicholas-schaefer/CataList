@@ -116,8 +116,8 @@ post '/contacts' do
     phone_number: phone_number,
     email: email,
     note: note)
-  erb "<p>something happened!</p>"
-  # load_all_contacts_page
+  # erb "<p>something happened!</p>"
+  load_all_contacts_page
 end
 
 # Get contact details

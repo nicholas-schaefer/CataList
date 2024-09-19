@@ -5,12 +5,9 @@ class DatabasePersistence
     @logger = logger
   end
 
-  def add_contact(first_name:, last_name:, phone_number:, email:, note: )
-    sql = <<~SQL
-    INSERT INTO contacts(first_name, last_name, phone, email, note)
-    VALUES              ($1,         $2,        $3,    $4,    $5)
-    SQL
-    query(sql, first_name, last_name, phone_number, email, note)
+  def query(statement, *params)
+    @logger.info "#{statement}: #{params}"
+    @db.exec_params(statement, params)
   end
 
   def find_contact(contact_id)
@@ -27,7 +24,7 @@ class DatabasePersistence
 
   def find_selected_contacts(limit: 4, offset:0)
     sql = <<~SQL
-    SELECT *, concat_ws(' ', first_name, last_name) AS full_name FROM contacts
+    SELECT *, lower(concat_ws(' ', TRIM(first_name), TRIM(last_name))) AS full_name FROM contacts
     ORDER BY full_name
     LIMIT $1
     OFFSET $2
@@ -47,13 +44,6 @@ class DatabasePersistence
   def string_also_an_integer?(input)
     regex = /^\d+$/
     !!(regex =~ input)
-  end
-
-  private
-
-  def query(statement, *params)
-    @logger.info "#{statement}: #{params}"
-    @db.exec_params(statement, params)
   end
 
 end

@@ -68,8 +68,8 @@ SELECT * FROM contacts;
 /*
     Sort by full name
 */
--- SELECT *, concat_ws(' ', first_name, last_name) AS full_name FROM contacts
---     ORDER BY full_name;
+SELECT *, lower(concat_ws(' ', TRIM(first_name), TRIM(last_name))) AS full_name FROM contacts
+    ORDER BY full_name;
 
 /*
     Limits and ofsetts
