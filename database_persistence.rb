@@ -10,6 +10,14 @@ class DatabasePersistence
     @db.exec_params(statement, params)
   end
 
+  def add_contact(first_name:, last_name:, phone_number:, email:, note: )
+    sql = <<~SQL
+    INSERT INTO contacts(first_name, last_name, phone, email, note)
+    VALUES              ($1,         $2,        $3,    $4,    $5)
+    SQL
+    query(sql, first_name, last_name, phone_number, email, note)
+  end
+
   def find_contact(contact_id)
     sql = <<~SQL
     SELECT * FROM contacts
