@@ -219,8 +219,12 @@ textarea {
 
 .errors {
     border: 1px solid black;
-    background-color: lightcoral;
     background-color: lightyellow;
+}
+
+.success {
+    border: 1px solid black;
+    background-color: peachpuff;
 }
 
 @media screen and (min-width: 680px) {

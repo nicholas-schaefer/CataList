@@ -14,6 +14,7 @@ class DatabasePersistence
     sql = <<~SQL
     INSERT INTO contacts(first_name, last_name, phone, email, note)
     VALUES              ($1,         $2,        $3,    $4,    $5)
+    RETURNING id
     SQL
     query(sql, first_name, last_name, phone_number, email, note)
   end

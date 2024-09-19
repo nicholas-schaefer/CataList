@@ -33,6 +33,7 @@ before do
     email: "jwick@gmail.com",
     note: "no one messes with john wick!"
   }
+  @newly_added_contact_id ||= ""
 end
 
 def query_select_all_results
@@ -122,12 +123,12 @@ post '/contacts' do
   email = params['email'].strip
   note = params['note'].strip
   begin
-    @storage.add_contact(
-      first_name: first_name,
-      last_name: last_name,
-      phone_number: phone_number,
-      email: email,
-      note: note)
+    res = @storage.add_contact(
+            first_name: first_name,
+            last_name: last_name,
+            phone_number: phone_number,
+            email: email,
+            note: note)
   rescue StandardError => e
     # erb "<p>database rejected entry for some reason</p> <p>#{e.message}</p>"
     # @request_errors << e.message
@@ -146,6 +147,7 @@ post '/contacts' do
     }
     load_all_contacts_page
   else
+    @newly_added_contact_id = res.first["id"]
     load_all_contacts_page
   end
 end

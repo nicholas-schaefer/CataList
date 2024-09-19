@@ -10,6 +10,11 @@
             <button><img src="/images/search-icon.png" alt="search"></button>
         </form>
     </header>
+    <section class="<%= @newly_added_contact_id.empty? ? 'success hidden' : 'success' %>">
+        <h2>Contact successfuly created!</h2>
+        <p>You're so Popular!</p>
+        <a href="<%= @path_info + "/" + @newly_added_contact_id %>">View Newest Contact</a>
+    </section>
     <main>
         <article>
             <ul class="contacts">
