@@ -36,6 +36,8 @@ before do
   @newly_added_contact_id = ""
   @contact_successfully_edited = false
   @contact_successfully_deleted = false
+  @contacts_successfully_seeded = false
+  @count_contacts_successfully_seeded = nil
 end
 
 
@@ -171,6 +173,26 @@ post '/contacts' do
     @newly_added_contact_id = res.first["id"]
     load_all_contacts_page
   end
+end
+
+# Add Preset Entries to a database
+post '/contacts/seed_storage' do
+  # erb "<p>YAY!!!!!!!!!!!</p>"
+  begin
+    res = @storage.add_seed_contacts()
+    @count_contacts_successfully_seeded = res.cmd_tuples
+  rescue StandardError => e
+    erb "<p>evil</p> <p>#{e.message}</p>"
+  else
+    # @contact_successfully_deleted = true
+    @contacts_successfully_seeded = true
+    load_all_contacts_page
+  end
+end
+
+# Refreshes after seeing go the main contacts listing page
+get '/contacts/seed_storage' do
+  redirect to('/contacts')
 end
 
 # Delete All Contacts

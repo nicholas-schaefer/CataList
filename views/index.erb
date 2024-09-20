@@ -19,6 +19,10 @@
         <h2>Contact successfully deleted!</h2>
         <p>You are losing friendos!</p>
     </section>
+    <section class="<%= @contacts_successfully_seeded ? 'success' : 'success hidden' %>">
+        <h2>Contacts successfully added to storage!</h2>
+        <p><%= @count_contacts_successfully_seeded%> entries were added to get you started</p>
+    </section>
     <main>
         <article>
             <ul class="contacts">
@@ -48,6 +52,12 @@
             <% end %>
             </ul>
         </nav>
+    </section>
+
+    <section>
+        <form method="post" action= "/contacts/seed_storage">
+            <button>Seed Database</button>
+        </form>
     </section>
 
     <section>

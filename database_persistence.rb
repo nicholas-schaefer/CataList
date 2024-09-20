@@ -10,6 +10,23 @@ class DatabasePersistence
     @db.exec_params(statement, params)
   end
 
+  def add_seed_contacts
+    sql = <<~SQL
+    INSERT INTO contacts(first_name,    last_name,      phone,             email,              note)
+        VALUES          ('adam',        'smith',        '001-999-9999',    'asmith@aol.com',    'he likes long walks on the beach'),
+                        ('alfred',       null,          '002-999-9999',    'alfred@aol.com',    'friends with batman'),
+                        ('alex',        'frank',        '003-999-9999',    'afrank@aol.com',    'cool as a cucumber'),
+                        ('arthur',      'clark',        '004-999-9999',    'aclark@aol.com',    'kind of out there dude'),
+                        ('beyonce',     null,           '005-999-9999',    'cuff_it@aol.com',   'so hot, she doesn''t even have a last name'),
+                        ('zlatan',      'ibrahimović',  '006-999-9999',    'zlatan@aol.com',    'swedish soccer player'),
+                        (null,          'bond',         '007-999-9999',    'shaken@aol.com',    'wonder what his first name is?!!!'),
+                        ('special one', 'mourinho',     '008-999-9999',    'jose@aol.com',      'serial winner'),
+                        ('fred',        'the machine',  '009-999-9999',    'fred@aol.com',      'russians be where'),
+                        ('zaha',        null,           '010-999-9999',    'zaha@aol.com',      'he would be friends with zinedane serial winner');
+    SQL
+    query(sql)
+  end
+
   def add_contact(first_name:, last_name:, phone_number:, email:, note: )
     sql = <<~SQL
     INSERT INTO contacts(first_name, last_name, phone, email, note)
