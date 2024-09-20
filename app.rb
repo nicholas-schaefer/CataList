@@ -34,7 +34,9 @@ before do
     note: "no one messes with john wick!"
   }
   @newly_added_contact_id ||= ""
+  @contact_successfully_edited ||= nil
 end
+
 
 def query_select_all_results
   @storage.find_all_contacts
@@ -55,6 +57,30 @@ def valid_uuid_format?(uuid)
   uuid_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   return true if uuid_regex.match?(uuid.to_s.downcase)
   # log_and_raise_error("Given argument is not a valid UUID: '#{format_argument_output(uuid)}'")
+end
+
+#######################################
+# Form Front End Sanitization
+#######################################
+
+def sanitize_field_first_name(input)
+  input.strip.downcase
+end
+
+def sanitize_field_last_name(input)
+  input.strip.downcase
+end
+
+def sanitize_field_phone_number(input)
+  input.strip
+end
+
+def sanitize_field_email(input)
+  input.strip
+end
+
+def sanitize_field_note(input)
+  input.strip
 end
 
 #######################################
@@ -115,13 +141,11 @@ end
 
 # Add a new contact
 post '/contacts' do
-  # erb "<p>something happened!</p>"
-
-  first_name =  params['first_name'].strip.downcase #for sorting, should also have db trigger
-  last_name = params['last_name'].strip.downcase #see above, (too much work!)
-  phone_number = params['phone_number'].strip
-  email = params['email'].strip
-  note = params['note'].strip
+  first_name = sanitize_field_first_name(params['first_name'])
+  last_name = sanitize_field_last_name(params['last_name'])
+  phone_number = sanitize_field_phone_number(params['phone_number'])
+  email = sanitize_field_email(params['email'])
+  note = sanitize_field_note(params['note'])
   begin
     res = @storage.add_contact(
             first_name: first_name,
@@ -130,8 +154,6 @@ post '/contacts' do
             email: email,
             note: note)
   rescue StandardError => e
-    # erb "<p>database rejected entry for some reason</p> <p>#{e.message}</p>"
-    # @request_errors << e.message
     regex = /violates check constraint "need_a_name"/
     if !!(regex =~ e.message)
       @request_errors << "Both first name and last name cannot be empty"
@@ -152,13 +174,13 @@ post '/contacts' do
   end
 end
 
-# Get contact details
-get '/contacts/:contact_id' do
+# Update contact details
+post '/contacts/:contact_id' do
   load_contact_page
 end
 
-# Update contact details
-post '/contacts/:contact_id' do
+# Get contact details
+get '/contacts/:contact_id' do
   load_contact_page
 end
 
