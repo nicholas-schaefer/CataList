@@ -35,6 +35,7 @@ before do
   }
   @newly_added_contact_id = ""
   @contact_successfully_edited = false
+  @contact_successfully_deleted = false
 end
 
 
@@ -43,7 +44,7 @@ def query_select_all_results
 end
 
 def query_select_one_result(contact_id)
-  @storage.find_contact(contact_id)
+  @storage.find_contact(id: contact_id)
 end
 
 def page_title_tag(title:"", delimiter:"-", app_name:@app_name)
@@ -119,7 +120,8 @@ def load_all_contacts_page
 
   # @contacts = query_select_all_results
   @contacts = @storage.find_selected_contacts(limit: @pagination_item_limit, offset:pagination_offset)
-  @path_info = request.path_info
+  # @path_info = request.path_info
+  @path_info = "/contacts"
   @page_title_tag = page_title_tag(title:"home")
 
   erb :index, :layout => :layout
@@ -183,6 +185,7 @@ post '/contacts/:contact_id' do
   note = sanitize_field_note(params['note'])
   id = params['contact_id']
   begin
+    raise("contact id not found") unless valid_uuid_format?(id) && @storage.find_contact(id: id).ntuples == 1
     res = @storage.edit_contact(
             id: id,
             first_name: first_name,
@@ -216,8 +219,19 @@ get '/contacts/:contact_id' do
 end
 
 # Delete an existing contact
+# prevents success message if we've already deeleted this contact
 post '/contacts/:contact_id/delete' do
-  load_all_contacts_page
+  id = params['contact_id']
+  begin
+    raise("contact id not found") unless valid_uuid_format?(id) && @storage.find_contact(id: id).ntuples == 1 #Must find correct header fort this
+    res = @storage.delete_contact(id: id)
+  rescue StandardError => e
+    erb "<p>evil</p> <p>#{e.message}</p>"
+  else
+    # erb "<p>YAY!!!!!!!!!!!</p>"
+    @contact_successfully_deleted = true
+    load_all_contacts_page
+  end
 end
 
 # Refreshes after delete revert the url to the main contacts listing page

@@ -15,6 +15,10 @@
         <p>You are so Popular!</p>
         <a href="<%= @path_info + "/" + @newly_added_contact_id %>">View Newest Contact</a>
     </section>
+        <section class="<%= @contact_successfully_deleted ? 'success' : 'success hidden' %>">
+        <h2>Contact successfully deleted!</h2>
+        <p>You are losing friendos!</p>
+    </section>
     <main>
         <article>
             <ul class="contacts">
@@ -39,7 +43,7 @@
             <% @pages.each do |number|  %>
                 <% active_class = @validated_pagination_int == number ? 'active' : '' %>
                 <li>
-                    <a class= "<%= active_class %>"href="?page=<%= number %>"><%= number %></a>
+                    <a class= "<%= active_class %>"href="<%=@path_info%>?page=<%= number %>"><%= number %></a>
                 </li>
             <% end %>
             </ul>

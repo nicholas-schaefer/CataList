@@ -29,12 +29,20 @@ class DatabasePersistence
     query(sql, id, first_name, last_name, phone_number, email, note)
   end
 
-  def find_contact(contact_id)
+  def delete_contact(id:)
+    sql = <<~SQL
+    DELETE FROM contacts
+    WHERE id = $1
+    SQL
+    query(sql, id)
+  end
+
+  def find_contact(id:)
     sql = <<~SQL
     SELECT * FROM contacts
     WHERE id = $1;
     SQL
-    query(sql, contact_id)
+    query(sql, id)
   end
 
   def find_all_contacts
