@@ -110,7 +110,14 @@ end
 def load_all_contacts_page
   @path_info = "/contacts" # need to hard code this, handle form submit from other pages, can't use @path_info = request.path_info
   total_contacts_count = @storage.contacts_total_count
-  total_pages = total_contacts_count/@pagination_item_limit + 1
+
+
+  total_pages = nil #THIS WORKS BUT SHOULD MAKE IT A SEPARATE PAGINATION FUNCTION
+  if total_contacts_count.zero?
+    total_pages = 1
+  else
+    total_pages = ((total_contacts_count-1)/(@pagination_item_limit)) + 1
+  end
   @pages = (1..total_pages).to_a
 
   pagination_requested = params['page'] || '1'
