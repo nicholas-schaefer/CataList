@@ -19,6 +19,16 @@ class DatabasePersistence
     query(sql, first_name, last_name, phone_number, email, note)
   end
 
+  def edit_contact(first_name:, last_name:, phone_number:, email:, note:, id: )
+    sql = <<~SQL
+    UPDATE contacts
+    SET (first_name, last_name, phone, email, note) =
+        ($2,         $3,        $4,    $5,    $6)
+    WHERE id = $1
+    SQL
+    query(sql, id, first_name, last_name, phone_number, email, note)
+  end
+
   def find_contact(contact_id)
     sql = <<~SQL
     SELECT * FROM contacts

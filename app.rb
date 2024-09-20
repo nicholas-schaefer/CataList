@@ -23,18 +23,18 @@ end
 
 before do
   @storage ||= DatabasePersistence.new(logger: logger)
-  @app_name ||= "cat contacts"
+  @app_name = "cat contacts"
   @pagination_item_limit = 3
-  @request_errors ||= []
-  @add_contact_form ||= {
+  @request_errors = []
+  @add_contact_form = {
     first_name: "John",
     last_name: "Wick",
     phone_number: "867-5309",
     email: "jwick@gmail.com",
     note: "no one messes with john wick!"
   }
-  @newly_added_contact_id ||= ""
-  @contact_successfully_edited ||= nil
+  @newly_added_contact_id = ""
+  @contact_successfully_edited = false
 end
 
 
@@ -176,6 +176,37 @@ end
 
 # Update contact details
 post '/contacts/:contact_id' do
+  first_name = sanitize_field_first_name(params['first_name'])
+  last_name = sanitize_field_last_name(params['last_name'])
+  phone_number = sanitize_field_phone_number(params['phone_number'])
+  email = sanitize_field_email(params['email'])
+  note = sanitize_field_note(params['note'])
+  id = params['contact_id']
+  begin
+    res = @storage.edit_contact(
+            id: id,
+            first_name: first_name,
+            last_name: last_name,
+            phone_number: phone_number,
+            email: email,
+            note: note)
+  rescue StandardError => e
+    regex = /violates check constraint "need_a_name"/
+    if !!(regex =~ e.message)
+      @request_errors << "Both first name and last name cannot be empty"
+    else
+      @request_errors << "Unspecified problem - Are you sending post requests outside the form - don't!!!!!"
+    end
+    @edit_contact_form = {
+      first_name: first_name,
+      last_name: last_name,
+      phone_number: phone_number,
+      email: email,
+      note: note
+    }
+  else
+    @contact_successfully_edited = true
+  end
   load_contact_page
 end
 

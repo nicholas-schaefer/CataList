@@ -31,7 +31,7 @@
             <dd><%=@contact["note"]%></dd>
         </dl>
     </article>
-    <input type="checkbox" id=edit_contact class="hidden">
+    <input type="checkbox" id=edit_contact class="hidden" <%= @request_errors.empty? ? '' : 'checked' %>>
     <section class="modal">
         <article roll="edit-form-wrapper">
             <section class="<%= @request_errors.empty? ? 'errors hidden' : 'errors' %>">
@@ -42,24 +42,26 @@
             </section>
             <form roll="edit-form" method="post">
                 <dl>
+                    <input type="hidden" id="contact_id" name="contact_id" value="<%=@contact["id"]%>">
+
                     <dt><label for="profile_pic">Update profile picture:</label></dt>
                     <dd><input type="file" id="profile_pic" name="profile_pic" accept="image/png, image/jpeg"
                             size="2097152"></dd>
 
                     <dt><label for="first_name">first name</label></dt>
-                    <dd><input type="text" id="first_name" name="first_name" value="<%=@contact["first_name"]%>" required></dd>
+                    <dd><input type="text" maxlength="250" id="first_name" name="first_name" value="<%=@contact["first_name"]%>"></dd>
 
                     <dt><label for="last_name">last name</label></dt>
-                    <dd><input type="text" id="last_name" name="last_name" value="<%=@contact["last_name"]%>"></dd>
+                    <dd><input type="text" maxlength="250" id="last_name" name="last_name" value="<%=@contact["last_name"]%>"></dd>
 
                     <dt><label for="phone_number">phone number</label></dt>
-                    <dd><input type="text" id="phone_number" name="phone_number" value="<%=@contact["phone"]%>"></dd>
+                    <dd><input type="text" maxlength="30" id="phone_number" name="phone_number" value="<%=@contact["phone"]%>"></dd>
 
                     <dt><label for="email">email</label></dt>
-                    <dd><input type="email" id="email" name="email" value="<%=@contact["email"]%>"></dd>
+                    <dd><input type="email" maxlength="250" id="email" name="email" value="<%=@contact["email"]%>"></dd>
 
                     <dt><label for="note"></label>note</dt>
-                    <dd><textarea id="note" name="note"><%=@contact["note"]%></textarea></dd>
+                    <dd><textarea id="note" maxlength="250" name="note"><%=@contact["note"]%></textarea></dd>
                 </dl>
                 <button>Update Contact</button><label for="edit_contact" roll="link" id="cancel-link">Cancel</label>
                 <button formaction="<%=@delete_action%>" id="delete-button">delete this contact</button>
