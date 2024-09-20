@@ -36,7 +36,7 @@
             </ul>
         </article>
     </main>
-    <footer>
+    <section>
         <h2>View Additional Contacts</h2>
         <nav class="pagination">
             <ul>
@@ -48,7 +48,14 @@
             <% end %>
             </ul>
         </nav>
-    </footer>
+    </section>
+
+    <section>
+        <form method="post" action= "/contacts/delete_all">
+            <button id="delete-button">delete all contacts</button>
+        </form>
+    </section>
+
     <input type="checkbox" id="edit_contact" class="hidden" <%= @request_errors.empty? ? '' : 'checked' %>>
     <section class="modal">
         <article roll="edit-form-wrapper">

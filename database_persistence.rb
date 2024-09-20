@@ -37,6 +37,13 @@ class DatabasePersistence
     query(sql, id)
   end
 
+  def delete_all_contacts
+    sql = <<~SQL
+    DELETE FROM contacts
+    SQL
+    query(sql)
+  end
+
   def find_contact(id:)
     sql = <<~SQL
     SELECT * FROM contacts

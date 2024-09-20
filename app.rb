@@ -106,7 +106,7 @@ def load_contact_page
 end
 
 def load_all_contacts_page
-  # @request_errors = ["too lazy", "to tired", "need to get good"]
+  @path_info = "/contacts" # need to hard code this, handle form submit from other pages, can't use @path_info = request.path_info
   total_contacts_count = @storage.contacts_total_count
   total_pages = total_contacts_count/@pagination_item_limit + 1
   @pages = (1..total_pages).to_a
@@ -118,10 +118,7 @@ def load_all_contacts_page
   @validated_pagination_int = pagination_requested.to_i
   pagination_offset = (@validated_pagination_int - 1)* @pagination_item_limit
 
-  # @contacts = query_select_all_results
   @contacts = @storage.find_selected_contacts(limit: @pagination_item_limit, offset:pagination_offset)
-  # @path_info = request.path_info
-  @path_info = "/contacts"
   @page_title_tag = page_title_tag(title:"home")
 
   erb :index, :layout => :layout
@@ -174,6 +171,25 @@ post '/contacts' do
     @newly_added_contact_id = res.first["id"]
     load_all_contacts_page
   end
+end
+
+# Delete All Contacts
+post '/contacts/delete_all' do
+  # erb "<p>YAY!!!!!!!!!!!</p>"
+  begin
+    res = @storage.delete_all_contacts()
+  rescue StandardError => e
+    erb "<p>evil</p> <p>#{e.message}</p>"
+  else
+    # erb "<p>YAY!!!!!!!!!!!</p>"
+    @contact_successfully_deleted = true
+    load_all_contacts_page
+  end
+end
+
+# Refreshes after delete all the url to the main contacts listing page
+get '/contacts/delete_all' do
+  redirect to('/contacts')
 end
 
 # Update contact details
@@ -233,6 +249,8 @@ post '/contacts/:contact_id/delete' do
     load_all_contacts_page
   end
 end
+
+
 
 # Refreshes after delete revert the url to the main contacts listing page
 get '/contacts/:contact_id/delete' do
