@@ -40,6 +40,15 @@ before do
   @count_contacts_successfully_seeded = nil
 end
 
+def data_path
+  File.expand_path("../public/images/profiles", __FILE__)
+  # if ENV["RACK_ENV"] == "hack_test"
+  #   File.expand_path("../test/data", __FILE__)
+  # else
+  #   File.expand_path("../data", __FILE__)
+  # end
+end
+
 
 def query_select_all_results
   @storage.find_all_contacts
@@ -222,7 +231,30 @@ get '/contacts/delete_all' do
 end
 
 # Update contact details
+# BRILLIANT INSPIRATION: https://gist.github.com/runemadsen/3905593
+# also helpful https://stackoverflow.com/questions/2686044/file-upload-with-sinatra
+# also good video https://www.youtube.com/watch?v=1PPqDQZDABU
 post '/contacts/:contact_id' do
+  new_file_name = 'test1.jpg'
+  absolute_path = File.join(data_path, new_file_name)
+
+  if File.exist?(absolute_path)
+    raise "Unable to create file, file already exists"
+  end
+
+  File.open(absolute_path, mode = 'wb') do |f|
+    file = params['profile_pic']['tempfile']
+    f.write(file.read)
+    # f.write(params['profile_pic'])
+  end
+
+  # if File.open(absolute_path, "w")
+  # else
+  #   raise "Unable to create file, invalid file path"
+  # end
+
+
+
   first_name = sanitize_field_first_name(params['first_name'])
   last_name = sanitize_field_last_name(params['last_name'])
   phone_number = sanitize_field_phone_number(params['phone_number'])
