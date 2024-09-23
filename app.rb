@@ -235,32 +235,36 @@ end
 # also helpful https://stackoverflow.com/questions/2686044/file-upload-with-sinatra
 # also good video https://www.youtube.com/watch?v=1PPqDQZDABU
 post '/contacts/:contact_id' do
-  new_file_name = 'test1.jpg'
-  absolute_path = File.join(data_path, new_file_name)
-
-  if File.exist?(absolute_path)
-    raise "Unable to create file, file already exists"
-  end
-
-  File.open(absolute_path, mode = 'wb') do |f|
-    file = params['profile_pic']['tempfile']
-    f.write(file.read)
-    # f.write(params['profile_pic'])
-  end
-
-  # if File.open(absolute_path, "w")
-  # else
-  #   raise "Unable to create file, invalid file path"
-  # end
-
-
-
   first_name = sanitize_field_first_name(params['first_name'])
   last_name = sanitize_field_last_name(params['last_name'])
   phone_number = sanitize_field_phone_number(params['phone_number'])
   email = sanitize_field_email(params['email'])
   note = sanitize_field_note(params['note'])
   id = params['contact_id']
+  profile_pic = params['profile_pic']
+
+  # new_file_name = 'test1.jpg'
+  # absolute_path = File.join(data_path, new_file_name)
+
+  if profile_pic
+    picture_file_extension =
+    case profile_pic['type']
+    when 'image/jpeg' then 'jpg'
+    when 'image/png' then 'png'
+    else
+      raise("Invalid filetype, png, or jpg required")
+    end
+
+    new_file_name = "#{id}.#{picture_file_extension}"
+    absolute_path = File.join(data_path, new_file_name)
+
+    write_operation = (File.open(absolute_path, mode = 'wb') do |f|
+      file = profile_pic['tempfile']
+      f.write(file.read)
+    end)
+    raise("write operation failed") unless write_operation > 0
+  end
+
   begin
     raise("contact id not found") unless valid_uuid_format?(id) && @storage.find_contact(id: id).ntuples == 1
     res = @storage.edit_contact(

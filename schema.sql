@@ -27,6 +27,39 @@
 --         )
 -- );
 
+
+-- DROP TABLE profile_images
+-- CREATE TABLE profile_images (
+--     profile_image_id uuid DEFAULT gen_random_uuid(),
+--     contact_id uuid,
+--     file_type varchar(250) NOT NULL,
+--     file_extension varchar(250) NOT NULL,
+--     file_name varchar(501) GENERATED ALWAYS AS (profile_image_id || '.' || file_extension) STORED,
+--     created_at timestamp NOT NULL DEFAULT (timezone('utc', now())),
+--     PRIMARY KEY (profile_image_id)
+-- )
+
+-- \d profile_images
+
+-- INSERT INTO profile_images (file_type, file_extension)
+--     VALUES('image/jpeg', 'jpg');
+
+-- INSERT INTO profile_images (file_type, file_extension)
+--     VALUES('image/png', 'png');
+
+-- UPDATE profile_images
+--     SET contact_id = '44179234-39c5-4e60-8da8-2750b387f6a8'
+
+-- SELECT * FROM profile_images;
+SELECT c.first_name, c.last_name, c.id, pi.file_name, pi.created_at FROM contacts AS c
+    JOIN profile_images AS pi ON c.id = pi.contact_id
+    ORDER BY pi.created_at DESC
+    LIMIT 1
+    -- WHERE contact_id = '44179234-39c5-4e60-8da8-2750b387f6a8';
+
+-- select now() at time zone 'utc';
+
+
 /*
     Populate Database
 */
@@ -50,7 +83,7 @@
 
 -- \d contacts
 
-SELECT * FROM contacts;
+-- SELECT * FROM contacts;
 
 /*
     Get all the contacts
@@ -68,8 +101,8 @@ SELECT * FROM contacts;
 /*
     Sort by full name
 */
-SELECT *, lower(concat_ws(' ', TRIM(first_name), TRIM(last_name))) AS full_name FROM contacts
-    ORDER BY full_name;
+-- SELECT *, lower(concat_ws(' ', TRIM(first_name), TRIM(last_name))) AS full_name FROM contacts
+--     ORDER BY full_name;
 
 /*
     Limits and ofsetts
