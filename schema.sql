@@ -51,10 +51,12 @@
 --     SET contact_id = '44179234-39c5-4e60-8da8-2750b387f6a8'
 
 -- SELECT * FROM profile_images;
+
+
 SELECT c.first_name, c.last_name, c.id, pi.file_name, pi.created_at FROM contacts AS c
-    JOIN profile_images AS pi ON c.id = pi.contact_id
+    LEFT JOIN profile_images AS pi ON c.id = pi.contact_id
     ORDER BY pi.created_at DESC
-    LIMIT 1
+    -- LIMIT 1
     -- WHERE contact_id = '44179234-39c5-4e60-8da8-2750b387f6a8';
 
 -- select now() at time zone 'utc';

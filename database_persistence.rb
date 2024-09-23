@@ -27,6 +27,15 @@ class DatabasePersistence
     query(sql)
   end
 
+  def add_image(contact_id:, file_type:, file_extension: )
+    sql = <<~SQL
+    INSERT INTO profile_images(contact_id, file_type, file_extension)
+    VALUES                    ($1,         $2,        $3)
+    RETURNING profile_image_id
+    SQL
+    query(sql, contact_id, file_type, file_extension)
+  end
+
   def add_contact(first_name:, last_name:, phone_number:, email:, note: )
     sql = <<~SQL
     INSERT INTO contacts(first_name, last_name, phone, email, note)

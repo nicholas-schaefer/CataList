@@ -247,15 +247,23 @@ post '/contacts/:contact_id' do
   # absolute_path = File.join(data_path, new_file_name)
 
   if profile_pic
+    picture_file_type = profile_pic['type']
     picture_file_extension =
-    case profile_pic['type']
+    case picture_file_type
     when 'image/jpeg' then 'jpg'
     when 'image/png' then 'png'
     else
       raise("Invalid filetype, png, or jpg required")
     end
 
-    new_file_name = "#{id}.#{picture_file_extension}"
+    query_add_image = @storage.add_image(
+      contact_id: id,
+      file_type: picture_file_type,
+      file_extension: picture_file_extension)
+
+    profile_image_id = query_add_image.first["profile_image_id"]
+
+    new_file_name = "#{profile_image_id}.#{picture_file_extension}"
     absolute_path = File.join(data_path, new_file_name)
 
     write_operation = (File.open(absolute_path, mode = 'wb') do |f|
