@@ -53,11 +53,11 @@
 -- SELECT * FROM profile_images;
 
 
-SELECT c.first_name, c.last_name, c.id, pi.file_name, pi.created_at FROM contacts AS c
+SELECT c.id, c.first_name, c.last_name, c.phone, c.email, c.note, pi.file_name FROM contacts AS c
     LEFT JOIN profile_images AS pi ON c.id = pi.contact_id
+    WHERE c.id = '024b318a-a30c-4363-b1f4-9f6f87b6bb3f'
     ORDER BY pi.created_at DESC
-    -- LIMIT 1
-    -- WHERE contact_id = '44179234-39c5-4e60-8da8-2750b387f6a8';
+    LIMIT 1
 
 -- select now() at time zone 'utc';
 

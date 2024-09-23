@@ -106,6 +106,15 @@ def load_contact_page
   halt 404 unless result.ntuples == 1
 
   @contact = result.first
+
+  image_file_path = "/images/profiles/"
+  if @contact["file_name"]
+    image_file_path += @contact["file_name"]
+  else
+    image_file_path += "no-image-found-placeholder.png"
+  end
+  @contact["image_file_path"] = image_file_path
+
   @path_slug = params['contact_id']
   @path_info = request.path_info
   @edit_action = "#{@path_info}/edit"
@@ -242,9 +251,6 @@ post '/contacts/:contact_id' do
   note = sanitize_field_note(params['note'])
   id = params['contact_id']
   profile_pic = params['profile_pic']
-
-  # new_file_name = 'test1.jpg'
-  # absolute_path = File.join(data_path, new_file_name)
 
   if profile_pic
     picture_file_type = profile_pic['type']

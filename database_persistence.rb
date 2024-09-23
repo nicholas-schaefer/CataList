@@ -70,10 +70,23 @@ class DatabasePersistence
     query(sql)
   end
 
+  # We are upgrading this method below
   def find_contact(id:)
     sql = <<~SQL
     SELECT * FROM contacts
     WHERE id = $1;
+    SQL
+    query(sql, id)
+  end
+
+  def find_contact(id:)
+    sql = <<~SQL
+    SELECT c.id, c.first_name, c.last_name, c.phone, c.email, c.note, pi.file_name
+    FROM contacts AS c
+    LEFT JOIN profile_images AS pi ON c.id = pi.contact_id
+    WHERE c.id = $1
+    ORDER BY pi.created_at DESC
+    LIMIT 1;
     SQL
     query(sql, id)
   end
