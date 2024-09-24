@@ -31,7 +31,7 @@
 -- DROP TABLE profile_images
 -- CREATE TABLE profile_images (
 --     profile_image_id uuid DEFAULT gen_random_uuid(),
---     contact_id uuid,
+--     contact_id uuid references contacts(id) ON DELETE CASCADE,
 --     file_type varchar(250) NOT NULL,
 --     file_extension varchar(250) NOT NULL,
 --     file_name varchar(501) GENERATED ALWAYS AS (profile_image_id || '.' || file_extension) STORED,
@@ -39,6 +39,7 @@
 --     PRIMARY KEY (profile_image_id)
 -- )
 
+-- SELECT * FROM contacts
 -- \d profile_images
 
 -- INSERT INTO profile_images (file_type, file_extension)
@@ -53,11 +54,11 @@
 -- SELECT * FROM profile_images;
 
 
-SELECT c.id, c.first_name, c.last_name, c.phone, c.email, c.note, pi.file_name FROM contacts AS c
-    LEFT JOIN profile_images AS pi ON c.id = pi.contact_id
-    WHERE c.id = '024b318a-a30c-4363-b1f4-9f6f87b6bb3f'
-    ORDER BY pi.created_at DESC
-    LIMIT 1
+-- SELECT c.id, c.first_name, c.last_name, c.phone, c.email, c.note, pi.file_name FROM contacts AS c
+--     LEFT JOIN profile_images AS pi ON c.id = pi.contact_id
+--     WHERE c.id = '024b318a-a30c-4363-b1f4-9f6f87b6bb3f'
+--     ORDER BY pi.created_at DESC
+--     LIMIT 1
 
 -- select now() at time zone 'utc';
 

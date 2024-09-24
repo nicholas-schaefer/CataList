@@ -40,6 +40,30 @@ before do
   @count_contacts_successfully_seeded = nil
 end
 
+def get_all_file_system_image_names
+  dir = File.expand_path("../public/images/profiles", __FILE__)
+
+  # Ensure the directory exists
+  return [] unless Dir.exist?(dir)
+
+  # Get all entries in the directory, filter out subdirectories and special entries
+  paths =
+    (Dir.entries(dir).select do |entry|
+      next if entry == '.' || entry == '..' # Skip current and parent directory
+      file_path = File.join(dir, entry)
+      File.file?(file_path) # Include only files
+    end)
+end
+
+def delete_all_file_system_images
+  file_system_image_names = get_all_file_system_image_names
+
+  file_system_image_names.each do |fname|
+    fpath = data_path + "/" + fname
+    File.delete(fpath)
+  end
+end
+
 def data_path
   File.expand_path("../public/images/profiles", __FILE__)
   # if ENV["RACK_ENV"] == "hack_test"
@@ -111,7 +135,7 @@ def load_contact_page
   if @contact["file_name"]
     image_file_path += @contact["file_name"]
   else
-    image_file_path += "no-image-found-placeholder.png"
+    image_file_path += "/_no_profile_default/no-image-found-placeholder.png"
   end
   @contact["image_file_path"] = image_file_path
 
@@ -222,6 +246,7 @@ end
 
 # Delete All Contacts
 post '/contacts/delete_all' do
+  delete_all_file_system_images
   # erb "<p>YAY!!!!!!!!!!!</p>"
   begin
     res = @storage.delete_all_contacts()
