@@ -39,7 +39,8 @@
 --     PRIMARY KEY (profile_image_id)
 -- )
 
--- SELECT * FROM contacts
+SELECT * FROM contacts;
+SELECT * FROM profile_images;
 -- \d profile_images
 
 -- INSERT INTO profile_images (file_type, file_extension)

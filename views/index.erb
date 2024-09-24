@@ -75,7 +75,7 @@
                     <p><%= error_message %></p>
                 <% end %>
             </section>
-            <form roll="edit-form" method="post" name="add-contact" action="/contacts">
+            <form roll="edit-form" method="post" name="add-contact" action="/contacts" enctype="multipart/form-data">
                 <dl>
                     <dt><label for="profile_pic">Update profile picture:</label></dt>
                     <dd><input type="file" id="profile_pic" name="profile_pic" accept="image/png, image/jpeg"

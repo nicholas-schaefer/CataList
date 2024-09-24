@@ -205,32 +205,30 @@ post '/contacts' do
   phone_number = sanitize_field_phone_number(params['phone_number'])
   email = sanitize_field_email(params['email'])
   note = sanitize_field_note(params['note'])
-  begin
-    res = @storage.add_contact(
-            first_name: first_name,
-            last_name: last_name,
-            phone_number: phone_number,
-            email: email,
-            note: note)
-  rescue StandardError => e
-    regex = /violates check constraint "need_a_name"/
-    if !!(regex =~ e.message)
-      @request_errors << "Both first name and last name cannot be empty"
-    else
-      @request_errors << "Unspecified problem - Are you sending post requests outside the form - don't!!!!!"
+
+  handle_contact_text_creation(
+    first_name: first_name,
+    last_name: last_name,
+    phone_number: phone_number,
+    email: email,
+    note: note)
+
+  if @request_errors.empty?
+    profile_pic = params['profile_pic']
+    newly_created_profile_image_id = nil
+    if profile_pic
+      newly_created_profile_image_id =
+        handle_image_upload(profile_pic: profile_pic, picture_file_type: profile_pic['type'], contact_id: @newly_added_contact_id,)
     end
-    @add_contact_form = {
-      first_name: first_name,
-      last_name: last_name,
-      phone_number: phone_number,
-      email: email,
-      note: note
-    }
-    load_all_contacts_page
-  else
-    @newly_added_contact_id = res.first["id"]
-    load_all_contacts_page
+
+    image_upload_failed_abort_required = (newly_created_profile_image_id == false)
+    if image_upload_failed_abort_required
+      @storage.delete_contact(id: @newly_added_contact_id)
+      @newly_added_contact_id = ""
+    end
   end
+
+  load_all_contacts_page
 end
 
 # Add Preset Entries to a database
@@ -302,6 +300,34 @@ def handle_image_upload(profile_pic:, picture_file_type:, contact_id:)
   end
 end
 
+def handle_contact_text_creation(first_name:, last_name:, phone_number:, email:, note:)
+  begin
+    res = @storage.add_contact(
+            first_name: first_name,
+            last_name: last_name,
+            phone_number: phone_number,
+            email: email,
+            note: note)
+  rescue StandardError => e
+    regex = /violates check constraint "need_a_name"/
+    if !!(regex =~ e.message)
+      @request_errors << "Both first name and last name cannot be empty"
+    else
+      @request_errors << "Unspecified problem - Are you sending post requests outside the form - don't!!!!!"
+    end
+    @add_contact_form = {
+      first_name: first_name,
+      last_name: last_name,
+      phone_number: phone_number,
+      email: email,
+      note: note
+    }
+  else
+    @newly_added_contact_id = res.first["id"]
+  end
+end
+
+
 def handle_contact_text_update(contact_id:, first_name:, last_name:, phone_number:, email:, note:)
   begin
     res = @storage.edit_contact(
@@ -346,8 +372,6 @@ post '/contacts/:contact_id' do
   end
 
   image_upload_failed_abort_required = (newly_created_profile_image_id == false)
-  binding.pry
-
   unless image_upload_failed_abort_required
     first_name = sanitize_field_first_name(params['first_name'])
     last_name = sanitize_field_last_name(params['last_name'])
