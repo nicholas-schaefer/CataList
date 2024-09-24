@@ -38,6 +38,24 @@ a   {
     display: var(--link-display);
 }
 
+.profile-image {
+    display: block;
+    margin: 0 auto;
+    max-width: 300px;
+}
+
+dt {
+    font-weight: bold;
+}
+
+dl, dd {
+    font-size: 1.1rem;
+}
+
+dd {
+    margin-bottom: 1em;
+    margin-left: 1em;
+}
 
 .contacts li {
     border-bottom: 2px solid gray;
@@ -53,6 +71,7 @@ a   {
 
 .page {
     background-color: lightgreen;
+    max-width: 800px;
 }
 
 .page > * {

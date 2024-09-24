@@ -6,29 +6,27 @@
                 <li><label for="edit_contact" roll="link">Edit</label></li>
             </ul>
         </nav>
-        <h2>Name: <%= full_name(first_name: @contact["first_name"], last_name: @contact["last_name"])%></h2>
+        <h2><%= full_name(first_name: @contact["first_name"], last_name: @contact["last_name"])%></h2>
     </header>
     <section class="<%= @contact_successfully_edited ? 'success' : 'success hidden' %>">
         <h2>Contact successfully updated.</h2>
             <p>UPDATING LIKE A BOSS!!!</p>
     </section>
     <article>
-        <img src=<%= @contact["image_file_path"] %> alt="profile image">
+        <img class="profile-image" src=<%= @contact["image_file_path"] %> alt="profile image">
         <dl>
-            <dt>query test</dt>
-            <dd><%=@contact%></dd>
-            <dt>url slug</dt>
-            <dd><%=@path_slug%></dd>
-            <dt>url path</dt>
-            <dd><%=@path_info%></dd>
-            <dt>id</dt>
-            <dd><%=@contact["id"]%></dd>
+            <% unless @contact["phone"].empty?%>
             <dt>phone</dt>
             <dd><%=@contact["phone"]%></dd>
+            <% end%>
+            <% unless @contact["email"].empty?%>
             <dt>email</dt>
             <dd><%=@contact["email"]%></dd>
+            <% end%>
+            <% unless @contact["note"].empty?%>
             <dt>note</dt>
             <dd><%=@contact["note"]%></dd>
+            <% end%>
         </dl>
     </article>
     <input type="checkbox" id=edit_contact class="hidden" <%= @request_errors.empty? ? '' : 'checked' %>>
