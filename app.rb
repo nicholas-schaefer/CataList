@@ -119,6 +119,15 @@ def sanitize_field_note(input)
   input.strip
 end
 
+def acceptable_image_type?(file_type)
+  case file_type
+  when 'image/jpeg' then 'jpg'
+  when 'image/png' then 'png'
+  else
+    false
+  end
+end
+
 #######################################
 # Pages
 #######################################
@@ -135,7 +144,7 @@ def load_contact_page
   if @contact["file_name"]
     image_file_path += @contact["file_name"]
   else
-    image_file_path += "/_no_profile_default/no-image-found-placeholder.png"
+    image_file_path += "_no_profile_default/no-image-found-placeholder.png"
   end
   @contact["image_file_path"] = image_file_path
 
@@ -264,31 +273,18 @@ get '/contacts/delete_all' do
   redirect to('/contacts')
 end
 
-# Update contact details
-# BRILLIANT INSPIRATION: https://gist.github.com/runemadsen/3905593
-# also helpful https://stackoverflow.com/questions/2686044/file-upload-with-sinatra
-# also good video https://www.youtube.com/watch?v=1PPqDQZDABU
-post '/contacts/:contact_id' do
-  first_name = sanitize_field_first_name(params['first_name'])
-  last_name = sanitize_field_last_name(params['last_name'])
-  phone_number = sanitize_field_phone_number(params['phone_number'])
-  email = sanitize_field_email(params['email'])
-  note = sanitize_field_note(params['note'])
-  id = params['contact_id']
-  profile_pic = params['profile_pic']
+def contact_exists?(contact_id)
+  valid_uuid_format?(contact_id) && @storage.find_contact(id: contact_id).ntuples == 1
+end
 
-  if profile_pic
-    picture_file_type = profile_pic['type']
-    picture_file_extension =
-    case picture_file_type
-    when 'image/jpeg' then 'jpg'
-    when 'image/png' then 'png'
-    else
-      raise("Invalid filetype, png, or jpg required")
-    end
-
+def handle_image_upload(profile_pic:, picture_file_type:, contact_id:)
+  picture_file_extension = acceptable_image_type?(picture_file_type)
+  if picture_file_extension == false
+    @request_errors << "Invalid filetype, png, or jpg required"
+    false
+  else
     query_add_image = @storage.add_image(
-      contact_id: id,
+      contact_id: contact_id,
       file_type: picture_file_type,
       file_extension: picture_file_extension)
 
@@ -302,12 +298,14 @@ post '/contacts/:contact_id' do
       f.write(file.read)
     end)
     raise("write operation failed") unless write_operation > 0
+    profile_image_id
   end
+end
 
+def handle_contact_text_update(contact_id:, first_name:, last_name:, phone_number:, email:, note:)
   begin
-    raise("contact id not found") unless valid_uuid_format?(id) && @storage.find_contact(id: id).ntuples == 1
     res = @storage.edit_contact(
-            id: id,
+            id: contact_id,
             first_name: first_name,
             last_name: last_name,
             phone_number: phone_number,
@@ -330,6 +328,46 @@ post '/contacts/:contact_id' do
   else
     @contact_successfully_edited = true
   end
+end
+
+# Update contact details
+# BRILLIANT INSPIRATION: https://gist.github.com/runemadsen/3905593
+# also helpful https://stackoverflow.com/questions/2686044/file-upload-with-sinatra
+# also good video https://www.youtube.com/watch?v=1PPqDQZDABU
+post '/contacts/:contact_id' do
+  id = params['contact_id']
+  raise("contact id not found") unless contact_exists?(id)
+
+  profile_pic = params['profile_pic']
+  newly_created_profile_image_id = nil
+  if profile_pic
+    newly_created_profile_image_id =
+      handle_image_upload(profile_pic: profile_pic, picture_file_type: profile_pic['type'], contact_id: id,)
+  end
+
+  image_upload_failed_abort_required = (newly_created_profile_image_id == false)
+  binding.pry
+
+  unless image_upload_failed_abort_required
+    first_name = sanitize_field_first_name(params['first_name'])
+    last_name = sanitize_field_last_name(params['last_name'])
+    phone_number = sanitize_field_phone_number(params['phone_number'])
+    email = sanitize_field_email(params['email'])
+    note = sanitize_field_note(params['note'])
+
+    handle_contact_text_update(
+      contact_id: id,
+      first_name: first_name,
+      last_name: last_name,
+      phone_number: phone_number,
+      email: email,
+      note: note)
+
+    if @contact_successfully_edited == false
+      @storage.delete_image(profile_image_id: newly_created_profile_image_id)
+    end
+  end
+
   load_contact_page
 end
 

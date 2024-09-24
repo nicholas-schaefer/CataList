@@ -36,6 +36,14 @@ class DatabasePersistence
     query(sql, contact_id, file_type, file_extension)
   end
 
+  def delete_image(profile_image_id:)
+    sql = <<~SQL
+    DELETE FROM profile_images
+    WHERE profile_image_id = $1
+    SQL
+    query(sql, profile_image_id)
+  end
+
   def add_contact(first_name:, last_name:, phone_number:, email:, note: )
     sql = <<~SQL
     INSERT INTO contacts(first_name, last_name, phone, email, note)
