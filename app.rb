@@ -6,6 +6,9 @@ require_relative 'database_persistence'
 
 configure do
   set :erb, :escape_html => true
+
+  enable :sessions
+  set :session_secret, SecureRandom.hex(32)
 end
 
 configure(:development) do
@@ -38,7 +41,30 @@ before do
   @contact_successfully_deleted = false
   @contacts_successfully_seeded = false
   @count_contacts_successfully_seeded = nil
+
+
+  session[:user_is_authenticated] ||= false
+
+  handle_authentication
 end
+
+#######################################
+# Authentication
+#######################################
+
+def handle_authentication
+  if logged_in? == false
+    # halt '<p>you are not logged in</p>'
+  end
+end
+
+def logged_in?
+  session[:user_is_authenticated]
+end
+
+#######################################
+# /Authentication
+#######################################
 
 def get_all_file_system_image_names
   dir = data_images_profiles_path
