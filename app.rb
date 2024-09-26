@@ -68,17 +68,19 @@ def logged_in?
   session[:user_is_authenticated]
 end
 
-def credentials_correct?(username_input:, password_input:)
-  # credentials = load_user_credentials
+def load_user_credentials
+  credentials_path = File.expand_path("../users.yaml", __FILE__)
+  YAML.load_file(credentials_path)
+end
 
-  # if credentials.key?(username_input)
-  #   bcrypt_password = BCrypt::Password.new(credentials[username_input])
-  #   bcrypt_password == password_input
-  # else
-  #   false
-  # end
-  # @user_name_form_input = username_input
-  username_input == "admin" && password_input == "secret"
+def credentials_correct?(username_input:, password_input:)
+  credentials = load_user_credentials
+
+  return false unless credentials.key?(username_input) # gaurd clause incase username not in database
+  valid_username = username_input
+
+  bcrypt_password = BCrypt::Password.new(credentials[valid_username])
+  bcrypt_password == password_input
 end
 
 def log_in
