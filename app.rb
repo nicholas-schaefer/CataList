@@ -41,7 +41,7 @@ before do
 end
 
 def get_all_file_system_image_names
-  dir = File.expand_path("../public/images/profiles", __FILE__)
+  dir = data_images_profiles_path
 
   # Ensure the directory exists
   return [] unless Dir.exist?(dir)
@@ -59,18 +59,22 @@ def delete_all_file_system_images
   file_system_image_names = get_all_file_system_image_names
 
   file_system_image_names.each do |fname|
-    fpath = data_path + "/" + fname
+    fpath = File.join(data_images_profiles_path, fname)
     File.delete(fpath)
   end
 end
 
-def data_path
-  File.expand_path("../public/images/profiles", __FILE__)
+# def data_path
+#   File.expand_path("../public/images/profiles", __FILE__)
   # if ENV["RACK_ENV"] == "hack_test"
   #   File.expand_path("../test/data", __FILE__)
   # else
   #   File.expand_path("../data", __FILE__)
   # end
+# end
+
+def data_images_profiles_path
+  File.expand_path("../data/images/profiles", __FILE__)
 end
 
 
@@ -189,6 +193,20 @@ end
 # Routes
 #######################################
 
+get '/images/profiles/_no_profile_default/no-image-found-placeholder.png' do
+  not_found_image = File.join(data_images_profiles_path, '_no_profile_default', 'no-image-found-placeholder.png' )
+  send_file(not_found_image)
+end
+
+get '/images/profiles/:profile_pic_id' do
+  # resource_path = File.join(data_images_profiles_path, params['profile_pic_id'])
+  # erb "<p>I've been hit #{resource_path} </p>"
+  profile_pic_path = File.join(data_images_profiles_path, params['profile_pic_id'])
+  halt 404 unless File.exist?(profile_pic_path)
+
+  send_file(profile_pic_path)
+end
+
 get '/' do
   redirect to('/contacts')
 end
@@ -289,7 +307,7 @@ def handle_image_upload(profile_pic:, picture_file_type:, contact_id:)
     profile_image_id = query_add_image.first["profile_image_id"]
 
     new_file_name = "#{profile_image_id}.#{picture_file_extension}"
-    absolute_path = File.join(data_path, new_file_name)
+    absolute_path = File.join(data_images_profiles_path, new_file_name)
 
     write_operation = (File.open(absolute_path, mode = 'wb') do |f|
       file = profile_pic['tempfile']
