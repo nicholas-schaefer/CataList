@@ -8,6 +8,7 @@ gem "erubis"
 gem "webrick"
 gem "pry"
 gem 'pg', '~> 1.5', '>= 1.5.6'
+gem 'bcrypt', '~> 3.1', '>= 3.1.20'
 
 group :production do
   gem "puma"

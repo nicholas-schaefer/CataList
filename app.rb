@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'pg'
-require 'pry'
+require "yaml"
+require "bcrypt"
 
 require_relative 'database_persistence'
 
@@ -12,6 +13,7 @@ configure do
 end
 
 configure(:development) do
+  require 'pry'
   require "sinatra/reloader"
   also_reload "database_persistence.rb"
 end
