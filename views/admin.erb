@@ -1,0 +1,25 @@
+<section class="page">
+    <header>
+        <h2>App Administration</h2>
+        <dl>
+            <dt>Login Status</dt>
+            <dd><%= @login_status %></dd>
+        </dl>
+        <article roll="edit-form-wrapper" class = <%= session[:user_is_authenticated] ? 'hidden' : '' %>>
+            <form roll="edit-form" method="post" action="/admin">
+                <dl>
+                    <dt><label for="user_name">Username</label></dt>
+                    <dd><input required type="text" id="user_name" name="user_name" value="<%= @user_name_form_input %>"></dd>
+
+                    <dt><label for="user_password">Password</label></dt>
+                    <dd><input required type="password" id="user_password" name="user_password"></dd>
+                </dl>
+                <button>Login</button>
+            </form>
+        </article>
+        <article roll="edit-form-wrapper" class = <%= session[:user_is_authenticated] ? '' : 'hidden' %>>
+            <form roll="edit-form" method="post" action="/admin/log_out">
+                <button>Logout</button>
+            </form>
+        </article>
+</section>

@@ -43,7 +43,10 @@ before do
   @count_contacts_successfully_seeded = nil
 
 
+  @user_name_form_input = nil
   session[:user_is_authenticated] ||= false
+  session[:user_name] ||= nil
+  session[:previous_path] ||= []
 
   handle_authentication
 end
@@ -53,13 +56,36 @@ end
 #######################################
 
 def handle_authentication
-  if logged_in? == false
-    # halt '<p>you are not logged in</p>'
+  if (logged_in? == false) && !(request.path_info == "/admin")
+    session[:previous_path][0] = request.path_info
+    redirect '/admin'
   end
 end
 
 def logged_in?
   session[:user_is_authenticated]
+end
+
+def credentials_correct?(username_input:, password_input:)
+  # credentials = load_user_credentials
+
+  # if credentials.key?(username_input)
+  #   bcrypt_password = BCrypt::Password.new(credentials[username_input])
+  #   bcrypt_password == password_input
+  # else
+  #   false
+  # end
+  # @user_name_form_input = username_input
+  username_input == "admin" && password_input == "secret"
+end
+
+def log_in
+  session[:user_is_authenticated] = true
+end
+
+def log_out
+  session[:user_is_authenticated] = false
+  session[:user_name] = nil
 end
 
 #######################################
@@ -162,6 +188,19 @@ end
 # Pages
 #######################################
 
+def load_welcome_login_page
+  @login_status =
+    case logged_in?
+    when true
+      "#{session[:user_name]} is now logged in"
+    else
+      "logged out"
+    end
+
+  halt erb :admin, :layout => :layout
+  # halt '<p>you are not logged in</p>'
+end
+
 def load_contact_page
   halt 404 unless valid_uuid_format?(params['contact_id'])
 
@@ -218,6 +257,32 @@ end
 #######################################
 # Routes
 #######################################
+
+post '/admin' do
+  username = params['user_name']
+  password = params['user_password']
+
+  if credentials_correct?(username_input: username, password_input: password)
+    session[:user_name] = username
+    log_in
+    redirect session[:previous_path].shift
+  else
+    @user_name_form_input = username
+  end
+  load_welcome_login_page
+
+  # erb "<p>username: #{username} password: #{password}</p>"
+end
+
+get '/admin' do
+  load_welcome_login_page
+end
+
+post '/admin/log_out' do
+  log_out
+  redirect '/admin'
+  # redirect 'session[:previous_path]'
+end
 
 get '/images/profiles/_no_profile_default/no-image-found-placeholder.png' do
   not_found_image = File.join(data_images_profiles_path, '_no_profile_default', 'no-image-found-placeholder.png' )
