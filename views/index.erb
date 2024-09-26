@@ -5,9 +5,10 @@
             <label for="edit_contact" roll="link" id="add-contact"><img src="/images/add-fab.png"
                     alt="add a contact"></label>
         </div>
+        <a href= "/admin">Account Login</a>
         <form roll="search-form" method="get">
-            <input type="text" id="search" name="q" placeholder="Search">
-            <button><img src="/images/search-icon.png" alt="search"></button>
+            <input type="text" id="search" name="q" placeholder="Search -upcoming feature" disabled>
+            <button disabled><img src="/images/search-icon.png" alt="search"></button>
         </form>
     </header>
     <section class="<%= @newly_added_contact_id.empty? ? 'success hidden' : 'success' %>">

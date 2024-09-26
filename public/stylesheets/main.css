@@ -24,6 +24,12 @@ body {
     color: var(--primary-text-color)
 }
 
+*:disabled {
+    background-color: dimgrey;
+    color: linen;
+    opacity: 1;
+  }
+
 a   {
     color: var(--link-color);
     cursor: var(--link-cursor);
@@ -79,7 +85,7 @@ dd {
 }
 
 #homepage-header {
-    background-color: blue;
+    background-color: peachpuff;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas:
