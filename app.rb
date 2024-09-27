@@ -4,6 +4,8 @@ require "yaml"
 require "bcrypt"
 
 require_relative 'database_persistence'
+require_relative 'f_system'
+require_relative 'user'
 
 configure do
   set :erb, :escape_html => true
@@ -16,6 +18,8 @@ configure(:development) do
   require 'pry'
   require "sinatra/reloader"
   also_reload "database_persistence.rb"
+  also_reload "f_system.rb"
+  also_reload "user.rb"
 end
 
 helpers do
@@ -28,6 +32,9 @@ end
 
 before do
   @storage ||= DatabasePersistence.new(logger: logger)
+  @f_system ||= Fsystem.new()
+  # @user || = User.new()
+
   @app_name = "CataList"
   @pagination_item_limit = 10
   @request_errors = []
@@ -76,7 +83,7 @@ end
 def credentials_correct?(username_input:, password_input:)
   credentials = load_user_credentials
 
-  return false unless credentials.key?(username_input) # gaurd clause incase username not in database
+  return false unless credentials.key?(username_input)
   valid_username = username_input
 
   bcrypt_password = BCrypt::Password.new(credentials[valid_username])
@@ -91,41 +98,6 @@ def log_out
   session[:user_is_authenticated] = false
   session[:user_name] = nil
 end
-
-
-
-#######################################
-# FileSystem
-#######################################
-
-def get_all_file_system_image_names
-  dir = data_images_profiles_path
-
-  # Ensure the directory exists
-  return [] unless Dir.exist?(dir)
-
-  # Get all entries in the directory, filter out subdirectories and special entries
-  paths =
-    (Dir.entries(dir).select do |entry|
-      next if entry == '.' || entry == '..' # Skip current and parent directory
-      file_path = File.join(dir, entry)
-      File.file?(file_path) # Include only files
-    end)
-end
-
-def delete_all_file_system_images
-  file_system_image_names = get_all_file_system_image_names
-
-  file_system_image_names.each do |fname|
-    fpath = File.join(data_images_profiles_path, fname)
-    File.delete(fpath)
-  end
-end
-
-def data_images_profiles_path
-  File.expand_path("../data/images/profiles", __FILE__)
-end
-
 
 #######################################
 # Sanitization
@@ -219,7 +191,7 @@ def load_all_contacts_page
   @pages = (1..total_pages).to_a
 
   pagination_requested = params['page'] || '1'
-  halt 404 unless @storage.string_also_an_integer?(pagination_requested) #lazy, need error message rewrite, helper class?
+  halt 404 unless string_also_an_integer?(pagination_requested) #lazy, need error message rewrite, helper class?
   halt 404 unless @pages.any?(pagination_requested.to_i) #need different error, means page not in range
 
   @validated_pagination_int = pagination_requested.to_i
@@ -268,14 +240,12 @@ post '/account/log_out' do
 end
 
 get '/images/profiles/_no_profile_default/no-image-found-placeholder.jpg' do
-  not_found_image = File.join(data_images_profiles_path, '_no_profile_default', 'no-image-found-placeholder.jpg' )
+  not_found_image = File.join(@f_system.data_images_profiles_path, '_no_profile_default', 'no-image-found-placeholder.jpg' )
   send_file(not_found_image)
 end
 
 get '/images/profiles/:profile_pic_id' do
-  # resource_path = File.join(data_images_profiles_path, params['profile_pic_id'])
-  # erb "<p>I've been hit #{resource_path} </p>"
-  profile_pic_path = File.join(data_images_profiles_path, params['profile_pic_id'])
+  profile_pic_path = File.join(@f_system.data_images_profiles_path, params['profile_pic_id'])
   halt 404 unless File.exist?(profile_pic_path)
 
   send_file(profile_pic_path)
@@ -344,7 +314,7 @@ end
 
 # Delete All Contacts
 post '/contacts/delete_all' do
-  delete_all_file_system_images
+  @f_system.delete_all_file_system_images
   # erb "<p>YAY!!!!!!!!!!!</p>"
   begin
     res = @storage.delete_all_contacts()
@@ -437,6 +407,11 @@ end
 # Uncategorized
 #######################################
 
+def string_also_an_integer?(input)
+  regex = /^\d+$/
+  !!(regex =~ input)
+end
+
 def contact_exists?(contact_id)
   valid_uuid_format?(contact_id) && @storage.find_contact(id: contact_id).ntuples == 1
 end
@@ -455,7 +430,7 @@ def handle_image_upload(profile_pic:, picture_file_type:, contact_id:)
     profile_image_id = query_add_image.first["profile_image_id"]
 
     new_file_name = "#{profile_image_id}.#{picture_file_extension}"
-    absolute_path = File.join(data_images_profiles_path, new_file_name)
+    absolute_path = File.join(@f_system.data_images_profiles_path, new_file_name)
 
     write_operation = (File.open(absolute_path, mode = 'wb') do |f|
       file = profile_pic['tempfile']

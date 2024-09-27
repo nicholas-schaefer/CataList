@@ -1,3 +1,4 @@
+# interactions with the database
 class DatabasePersistence
   def initialize(dbname: "cat_contacts", logger:)
     @db = PG.connect(dbname: dbname)
@@ -131,11 +132,6 @@ class DatabasePersistence
     result = query(sql)
     result = result.first["tuple_count"]
     result = result.to_i
-  end
-
-  def string_also_an_integer?(input)
-    regex = /^\d+$/
-    !!(regex =~ input)
   end
 
 end
