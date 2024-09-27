@@ -1,6 +1,5 @@
 class DatabasePersistence
   def initialize(dbname: "cat_contacts", logger:)
-    # @conn ||= PG.connect(dbname: dbname)
     @db = PG.connect(dbname: dbname)
     @logger = logger
   end
@@ -12,7 +11,7 @@ class DatabasePersistence
 
   def add_seed_contacts
     sql = <<~SQL
-      INSERT INTO contacts(first_name,    last_name,      phone,             email,              note)
+      INSERT INTO contacts(first_name,    last_name,      phone,             email,               note)
           VALUES          ('adam',        'smith',        '001-999-9999',    'asmith@aol.com',    'he likes long walks on the beach'),
                           ('alfred',       null,          '002-999-9999',    'alfred@aol.com',    'friends with batman'),
                           ('alex',        'frank',        '003-999-9999',    'afrank@aol.com',    'cool as a cucumber'),
@@ -90,14 +89,14 @@ class DatabasePersistence
     query(sql)
   end
 
-  # We are upgrading this method below
-  def find_contact(id:)
-    sql = <<~SQL
-    SELECT * FROM contacts
-    WHERE id = $1;
-    SQL
-    query(sql, id)
-  end
+  # We have upgraded this method below
+  # def find_contact(id:)
+  #   sql = <<~SQL
+  #   SELECT * FROM contacts
+  #   WHERE id = $1;
+  #   SQL
+  #   query(sql, id)
+  # end
 
   def find_contact(id:)
     sql = <<~SQL
@@ -115,7 +114,7 @@ class DatabasePersistence
     find_selected_contacts(limit: contacts_total_count, offset:0)
   end
 
-  def find_selected_contacts(limit: 4, offset:0)
+  def find_selected_contacts(limit:, offset:0)
     sql = <<~SQL
     SELECT *, lower(concat_ws(' ', TRIM(first_name), TRIM(last_name))) AS full_name FROM contacts
     ORDER BY full_name
