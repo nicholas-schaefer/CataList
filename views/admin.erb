@@ -5,7 +5,7 @@
             <dt>Login Status</dt>
             <dd><%= @login_status %></dd>
         </dl>
-        <article roll="edit-form-wrapper" class = <%= session[:user_is_authenticated] ? 'hidden' : '' %>>
+        <article roll="edit-form-wrapper" class = <%= @user.logged_in? ? 'hidden' : '' %>>
             <form roll="edit-form" method="post" action="/account">
                 <dl>
                     <dt><label for="user_name">Username</label></dt>
@@ -19,7 +19,7 @@
                 <button>Login</button>
             </form>
         </article>
-        <article roll="edit-form-wrapper" class = <%= session[:user_is_authenticated] ? '' : 'hidden' %>>
+        <article roll="edit-form-wrapper" class = <%= @user.logged_in? ? '' : 'hidden' %>>
             <form roll="edit-form" method="post" action="/account/log_out">
                 <button>Logout</button>
             </form>

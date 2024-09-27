@@ -33,10 +33,12 @@ end
 before do
   @storage ||= DatabasePersistence.new(logger: logger)
   @f_system ||= Fsystem.new()
-  # @user || = User.new()
+  session[:user] ||= User.new()
+  @user = session[:user]
 
-  @app_name = "CataList"
-  @pagination_item_limit = 10
+  @app_name = "CataList".freeze
+  PAGINATION_ITEM_LIMIT = 10
+
   @request_errors = []
   @add_contact_form = {
     first_name: "John",
@@ -45,6 +47,7 @@ before do
     email: "jwick@gmail.com",
     note: "no one messes with john wick!"
   }
+  @user_name_form_input = nil
   @newly_added_contact_id = ""
   @contact_successfully_edited = false
   @contact_successfully_deleted = false
@@ -52,9 +55,8 @@ before do
   @count_contacts_successfully_seeded = nil
 
 
-  @user_name_form_input = nil
-  session[:user_is_authenticated] ||= false
-  session[:user_name] ||= nil
+  # session[:user_is_authenticated] ||= false
+  # session[:user_name] ||= nil
   session[:previous_path] ||= []
 
   handle_authentication
@@ -65,39 +67,39 @@ end
 #######################################
 
 def handle_authentication
-  if (logged_in? == false) && !(request.path_info == "/account")
+  if (@user.logged_in? == false) && !(request.path_info == "/account")
     session[:previous_path][0] = request.path_info
     redirect '/account'
   end
 end
 
-def logged_in?
-  session[:user_is_authenticated]
-end
+# def logged_in?
+#   session[:user_is_authenticated]
+# end
 
-def load_user_credentials
-  credentials_path = File.expand_path("../users.yaml", __FILE__)
-  YAML.load_file(credentials_path)
-end
+# def load_user_credentials
+#   credentials_path = File.expand_path("../users.yaml", __FILE__)
+#   YAML.load_file(credentials_path)
+# end
 
-def credentials_correct?(username_input:, password_input:)
-  credentials = load_user_credentials
+# def credentials_correct?(username_input:, password_input:)
+#   credentials = load_user_credentials
 
-  return false unless credentials.key?(username_input)
-  valid_username = username_input
+#   return false unless credentials.key?(username_input)
+#   valid_username = username_input
 
-  bcrypt_password = BCrypt::Password.new(credentials[valid_username])
-  bcrypt_password == password_input
-end
+#   bcrypt_password = BCrypt::Password.new(credentials[valid_username])
+#   bcrypt_password == password_input
+# end
 
-def log_in
-  session[:user_is_authenticated] = true
-end
+# def log_in
+#   session[:user_is_authenticated] = true
+# end
 
-def log_out
-  session[:user_is_authenticated] = false
-  session[:user_name] = nil
-end
+# def log_out
+#   session[:user_is_authenticated] = false
+#   session[:user_name] = nil
+# end
 
 #######################################
 # Sanitization
@@ -147,9 +149,9 @@ end
 
 def load_account_management_page
   @login_status =
-    case logged_in?
+    case @user.logged_in?
     when true
-      "#{session[:user_name]} is now logged in"
+      "#{@user.name} is now logged in"
     else
       "logged out"
     end
@@ -186,7 +188,7 @@ def load_all_contacts_page
   if total_contacts_count.zero?
     total_pages = 1
   else
-    total_pages = ((total_contacts_count-1)/(@pagination_item_limit)) + 1
+    total_pages = ((total_contacts_count-1)/(PAGINATION_ITEM_LIMIT)) + 1
   end
   @pages = (1..total_pages).to_a
 
@@ -195,9 +197,9 @@ def load_all_contacts_page
   halt 404 unless @pages.any?(pagination_requested.to_i) #need different error, means page not in range
 
   @validated_pagination_int = pagination_requested.to_i
-  pagination_offset = (@validated_pagination_int - 1)* @pagination_item_limit
+  pagination_offset = (@validated_pagination_int - 1)* PAGINATION_ITEM_LIMIT
 
-  @contacts = @storage.find_selected_contacts(limit: @pagination_item_limit, offset:pagination_offset)
+  @contacts = @storage.find_selected_contacts(limit: PAGINATION_ITEM_LIMIT, offset:pagination_offset)
   @page_title_tag = page_title_tag(title:"home")
 
   erb :index, :layout => :layout
@@ -218,9 +220,9 @@ post '/account' do
   username = params['user_name']
   password = params['user_password']
 
-  if credentials_correct?(username_input: username, password_input: password)
-    session[:user_name] = username
-    log_in
+  if @user.credentials_correct?(username_input: username, password_input: password)
+    @user.name = username
+    @user.log_in
     redirect session[:previous_path].shift
   else
     @user_name_form_input = username
@@ -234,7 +236,7 @@ get '/account' do
 end
 
 post '/account/log_out' do
-  log_out
+  @user.log_out
   redirect '/account'
   # redirect 'session[:previous_path]'
 end
