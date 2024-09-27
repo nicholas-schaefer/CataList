@@ -28,7 +28,7 @@ end
 
 before do
   @storage ||= DatabasePersistence.new(logger: logger)
-  @app_name = "cat contacts"
+  @app_name = "CataList"
   @pagination_item_limit = 10
   @request_errors = []
   @add_contact_form = {
@@ -58,9 +58,9 @@ end
 #######################################
 
 def handle_authentication
-  if (logged_in? == false) && !(request.path_info == "/admin")
+  if (logged_in? == false) && !(request.path_info == "/account")
     session[:previous_path][0] = request.path_info
-    redirect '/admin'
+    redirect '/account'
   end
 end
 
@@ -120,27 +120,11 @@ def delete_all_file_system_images
   end
 end
 
-# def data_path
-#   File.expand_path("../public/images/profiles", __FILE__)
-  # if ENV["RACK_ENV"] == "hack_test"
-  #   File.expand_path("../test/data", __FILE__)
-  # else
-  #   File.expand_path("../data", __FILE__)
-  # end
-# end
 
 def data_images_profiles_path
   File.expand_path("../data/images/profiles", __FILE__)
 end
 
-
-def query_select_all_results
-  @storage.find_all_contacts
-end
-
-def query_select_one_result(contact_id)
-  @storage.find_contact(id: contact_id)
-end
 
 def page_title_tag(title:"", delimiter:"-", app_name:@app_name)
   return app_name if title.empty?
@@ -201,14 +185,15 @@ def load_welcome_login_page
       "logged out"
     end
 
+  @page_title_tag = page_title_tag(title:"account management")
+
   halt erb :admin, :layout => :layout
-  # halt '<p>you are not logged in</p>'
 end
 
 def load_contact_page
   halt 404 unless valid_uuid_format?(params['contact_id'])
 
-  result = query_select_one_result(params['contact_id'])
+  result = @storage.find_contact(id: params['contact_id'])
   halt 404 unless result.ntuples == 1
 
   @contact = result.first
@@ -217,7 +202,7 @@ def load_contact_page
   if @contact["file_name"]
     image_file_path += @contact["file_name"]
   else
-    image_file_path += "_no_profile_default/no-image-found-placeholder.png"
+    image_file_path += "_no_profile_default/no-image-found-placeholder.jpg"
   end
   @contact["image_file_path"] = image_file_path
 
@@ -262,7 +247,7 @@ end
 # Routes
 #######################################
 
-post '/admin' do
+post '/account' do
   username = params['user_name']
   password = params['user_password']
 
@@ -273,23 +258,22 @@ post '/admin' do
   else
     @user_name_form_input = username
   end
-  load_welcome_login_page
-
+  load_account_management_page
   # erb "<p>username: #{username} password: #{password}</p>"
 end
 
-get '/admin' do
-  load_welcome_login_page
+get '/account' do
+  load_account_management_page
 end
 
-post '/admin/log_out' do
+post '/account/log_out' do
   log_out
-  redirect '/admin'
+  redirect '/account'
   # redirect 'session[:previous_path]'
 end
 
-get '/images/profiles/_no_profile_default/no-image-found-placeholder.png' do
-  not_found_image = File.join(data_images_profiles_path, '_no_profile_default', 'no-image-found-placeholder.png' )
+get '/images/profiles/_no_profile_default/no-image-found-placeholder.jpg' do
+  not_found_image = File.join(data_images_profiles_path, '_no_profile_default', 'no-image-found-placeholder.jpg' )
   send_file(not_found_image)
 end
 
