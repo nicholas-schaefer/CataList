@@ -29,7 +29,7 @@ end
 before do
   @storage ||= DatabasePersistence.new(logger: logger)
   @app_name = "cat contacts"
-  @pagination_item_limit = 3
+  @pagination_item_limit = 10
   @request_errors = []
   @add_contact_form = {
     first_name: "John",

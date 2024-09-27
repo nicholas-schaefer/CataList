@@ -85,7 +85,7 @@ dd {
 }
 
 #homepage-header {
-    background-color: peachpuff;
+    background-color: rgb(194, 219, 221);
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas:
