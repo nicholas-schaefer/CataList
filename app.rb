@@ -61,6 +61,7 @@ before do
   @app_name = "CataList".freeze
   PAGINATION_ITEM_LIMIT = 10
 
+  # Methods
   handle_authentication
 end
 
@@ -86,7 +87,6 @@ end
 def valid_uuid_format?(uuid)
   uuid_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   return true if uuid_regex.match?(uuid.to_s.downcase)
-  # log_and_raise_error("Given argument is not a valid UUID: '#{format_argument_output(uuid)}'")
 end
 
 
@@ -97,15 +97,9 @@ end
 
 def load_account_management_page
   @login_status =
-    case @user.logged_in?
-    when true
-      "#{@user.name} is now logged in"
-    else
-      "logged out"
-    end
+    @user.logged_in? ? "#{@user.name} is now logged in" : "logged out"
 
   @page_title_tag = page_title_tag(title:"account management")
-
   halt erb :admin, :layout => :layout
 end
 
@@ -128,11 +122,10 @@ def load_contact_page
 end
 
 def load_all_contacts_page
-  @path_info = "/contacts" # need to hard code this, handle form submit from other pages, can't use @path_info = request.path_info
+  @path_info = "/contacts" # needed to hard code this, handle form submit from other pages, can't use @path_info = request.path_info
+
   total_contacts_count = @storage.contacts_total_count
-
-
-  total_pages = nil #THIS WORKS BUT SHOULD MAKE IT A SEPARATE PAGINATION FUNCTION
+  total_pages = nil
   if total_contacts_count.zero?
     total_pages = 1
   else
@@ -141,11 +134,11 @@ def load_all_contacts_page
   @pages = (1..total_pages).to_a
 
   pagination_requested = params['page'] || '1'
-  halt 404 unless string_also_an_integer?(pagination_requested) #lazy, need error message rewrite, helper class?
-  halt 404 unless @pages.any?(pagination_requested.to_i) #need different error, means page not in range
+  halt 404 unless string_also_an_integer?(pagination_requested)
+  halt 404 unless @pages.any?(pagination_requested.to_i)
 
   @validated_pagination_int = pagination_requested.to_i
-  pagination_offset = (@validated_pagination_int - 1)* PAGINATION_ITEM_LIMIT
+  pagination_offset = (@validated_pagination_int - 1) * PAGINATION_ITEM_LIMIT
 
   @contacts = @storage.find_selected_contacts(limit: PAGINATION_ITEM_LIMIT, offset:pagination_offset)
   @page_title_tag = page_title_tag(title:"home")
@@ -175,7 +168,6 @@ post '/account' do
     @user_name_form_input = username
   end
   load_account_management_page
-  # erb "<p>username: #{username} password: #{password}</p>"
 end
 
 get '/account' do
@@ -185,7 +177,6 @@ end
 post '/account/log_out' do
   @user.log_out
   redirect '/account'
-  # redirect 'session[:previous_path]'
 end
 
 get '/images/profiles/_no_profile_default/no-image-found-placeholder.jpg' do
@@ -204,14 +195,12 @@ get '/' do
   redirect to('/contacts')
 end
 
-# Get All Contacts
 get '/contacts' do
   load_all_contacts_page
 end
 
 # Add a new contact
 post '/contacts' do
-
   handle_contact_text_creation(
     first_name: params['first_name'],
     last_name: params['last_name'],
@@ -243,12 +232,11 @@ post '/contacts/seed_storage' do
     res = @storage.add_seed_contacts()
     @count_contacts_successfully_seeded = res.cmd_tuples
   rescue StandardError => e
-    erb "<p>evil</p> <p>#{e.message}</p>"
+    @request_errors << "seeding failed"
   else
-    # @contact_successfully_deleted = true
     @contacts_successfully_seeded = true
-    load_all_contacts_page
   end
+  load_all_contacts_page
 end
 
 # Refreshes after seeing go the main contacts listing page
@@ -259,16 +247,14 @@ end
 # Delete All Contacts
 post '/contacts/delete_all' do
   @f_system.delete_all_file_system_images
-  # erb "<p>YAY!!!!!!!!!!!</p>"
   begin
     res = @storage.delete_all_contacts()
   rescue StandardError => e
-    erb "<p>evil</p> <p>#{e.message}</p>"
+    @request_errors << "deletion failed"
   else
-    # erb "<p>YAY!!!!!!!!!!!</p>"
     @contact_successfully_deleted = true
-    load_all_contacts_page
   end
+  load_all_contacts_page
 end
 
 # Refreshes after delete all the url to the main contacts listing page
@@ -277,64 +263,56 @@ get '/contacts/delete_all' do
 end
 
 # Delete an existing contact
-# prevents success message if we've already deeleted this contact
 post '/contacts/:contact_id/delete' do
   id = params['contact_id']
   begin
-    raise("contact id not found") unless contact_exists?(id) #Must find correct header fort this
+    raise("contact not found") unless contact_exists?(id)
     res = @storage.delete_contact(id: id)
   rescue StandardError => e
-    erb "<p>evil</p> <p>#{e.message}</p>"
+    @request_errors << "contact deletion failed. contact may have already been deleted."
   else
-    # erb "<p>YAY!!!!!!!!!!!</p>"
     @contact_successfully_deleted = true
-    load_all_contacts_page
   end
+  load_all_contacts_page
 end
 
-
-# Refreshes after delete revert the url to the main contacts listing page
 get '/contacts/:contact_id/delete' do
   redirect to('/contacts')
 end
 
 # Update contact details
-# BRILLIANT INSPIRATION: https://gist.github.com/runemadsen/3905593
-# also helpful https://stackoverflow.com/questions/2686044/file-upload-with-sinatra
-# also good video https://www.youtube.com/watch?v=1PPqDQZDABU
+# inspiration: https://gist.github.com/runemadsen/3905593 and https://stackoverflow.com/questions/2686044/file-upload-with-sinatra
 post '/contacts/:contact_id' do
   id = params['contact_id']
-  raise("contact id not found") unless contact_exists?(id)
-
-  profile_pic = params['profile_pic']
-  newly_created_profile_image_id = nil
-  if profile_pic
-    newly_created_profile_image_id =
-      handle_image_upload(profile_pic: profile_pic, picture_file_type: profile_pic['type'], contact_id: id,)
-  end
-
-  image_upload_failed_abort_required = (newly_created_profile_image_id == false)
-  unless image_upload_failed_abort_required
-    first_name = @form_input.sanitize_field_first_name(params['first_name'])
-    last_name = @form_input.sanitize_field_last_name(params['last_name'])
-    phone_number = @form_input.sanitize_field_phone_number(params['phone_number'])
-    email = @form_input.sanitize_field_email(params['email'])
-    note = @form_input.sanitize_field_note(params['note'])
-
-    handle_contact_text_update(
-      contact_id: id,
-      first_name: params['first_name'],
-      last_name: params['last_name'],
-      phone_number: params['phone_number'],
-      email: params['email'],
-      note: params['note'])
-
-    if @contact_successfully_edited == false
-      @storage.delete_image(profile_image_id: newly_created_profile_image_id)
+  begin
+    raise("contact not found") unless contact_exists?(id)
+  rescue  StandardError => e
+    @request_errors << "contact edit failed. contact may have already been deleted."
+    load_all_contacts_page
+  else
+    profile_pic = params['profile_pic']
+    newly_created_profile_image_id = nil
+    if profile_pic
+      newly_created_profile_image_id =
+        handle_image_upload(profile_pic: profile_pic, picture_file_type: profile_pic['type'], contact_id: id,)
     end
-  end
 
-  load_contact_page
+    image_upload_failed_abort_required = (newly_created_profile_image_id == false)
+    unless image_upload_failed_abort_required
+      handle_contact_text_update(
+        contact_id: id,
+        first_name: params['first_name'],
+        last_name: params['last_name'],
+        phone_number: params['phone_number'],
+        email: params['email'],
+        note: params['note'])
+
+      if @contact_successfully_edited == false
+        @storage.delete_image(profile_image_id: newly_created_profile_image_id)
+      end
+    end
+    load_contact_page
+  end
 end
 
 # Get contact details
@@ -347,18 +325,10 @@ not_found do
   load_page_not_found
 end
 
+
 #######################################
 # Uncategorized
 #######################################
-
-def string_also_an_integer?(input)
-  regex = /^\d+$/
-  !!(regex =~ input)
-end
-
-def contact_exists?(contact_id)
-  valid_uuid_format?(contact_id) && @storage.find_contact(id: contact_id).ntuples == 1
-end
 
 def handle_image_upload(profile_pic:, picture_file_type:, contact_id:)
   picture_file_extension = @form_input.acceptable_image_type?(picture_file_type)
@@ -448,6 +418,15 @@ def handle_contact_text_update(contact_id:, first_name:, last_name:, phone_numbe
   else
     @contact_successfully_edited = true
   end
+end
+
+def string_also_an_integer?(input)
+  regex = /^\d+$/
+  !!(regex =~ input)
+end
+
+def contact_exists?(contact_id)
+  valid_uuid_format?(contact_id) && @storage.find_contact(id: contact_id).ntuples == 1
 end
 
 def page_title_tag(title:"", delimiter:"-", app_name:@app_name)

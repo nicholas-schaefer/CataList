@@ -11,7 +11,6 @@ class User
   end
 
   def log_in
-    # @is_authenticated = true
     self.is_authenticated = true
   end
 
@@ -38,14 +37,4 @@ class User
     YAML.load_file(credentials_path)
   end
 
-end
-
-
-
-# @user_name_form_input = nil
-# session[:user_is_authenticated] ||= false
-# session[:user_name] ||= nil
-
-def log_in
-  session[:user_is_authenticated] = true
 end

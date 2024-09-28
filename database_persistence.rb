@@ -90,6 +90,7 @@ class DatabasePersistence
     query(sql)
   end
 
+  # method not currently in use
   # We have upgraded this method below
   # def find_contact(id:)
   #   sql = <<~SQL
@@ -111,9 +112,11 @@ class DatabasePersistence
     query(sql, id)
   end
 
-  def find_all_contacts
-    find_selected_contacts(limit: contacts_total_count, offset:0)
-  end
+  # method not currently in use
+  # we are using below method currently
+  # def find_all_contacts
+  #   find_selected_contacts(limit: contacts_total_count, offset:0)
+  # end
 
   def find_selected_contacts(limit:, offset:0)
     sql = <<~SQL
@@ -135,19 +138,3 @@ class DatabasePersistence
   end
 
 end
-
-
-
-  # def initialize(logger)
-  #   @db = if Sinatra::Base.production?
-  #     PG.connect(ENV['DATABASE_URL'])
-  #   else
-  #     PG.connect(dbname: "todos")
-  #   end
-  #   @logger = logger
-  # end
-
-  # def query(statement, *params)
-  #   @logger.info "#{statement}: #{params}"
-  #   @db.exec_params(statement, params)
-  # end

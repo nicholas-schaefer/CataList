@@ -1,5 +1,10 @@
 <section class="page">
     <header>
+        <nav class = <%= @user.logged_in? ? '' : 'hidden' %>>
+            <ul>
+                <li><a href="/contacts">Contacts</a></li>
+            </ul>
+        </nav>
         <h2>Account Management</h2>
         <dl class= "success">
             <dt>Login Status</dt>
