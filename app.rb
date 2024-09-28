@@ -50,7 +50,6 @@ before do
     email: "jwick@gmail.com",
     note: "no one messes with john wick!"
   }
-  @user_name_form_input = nil
   @newly_added_contact_id = ""
   @contact_successfully_edited = false
   @contact_successfully_deleted = false
@@ -164,8 +163,6 @@ post '/account' do
     @user.name = username
     @user.log_in
     redirect session[:previous_path].shift
-  else
-    @user_name_form_input = username
   end
   load_account_management_page
 end
