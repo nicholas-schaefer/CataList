@@ -9,6 +9,7 @@ gem "webrick"
 gem "pry"
 gem 'pg', '~> 1.5', '>= 1.5.6'
 gem 'bcrypt', '~> 3.1', '>= 3.1.20'
+gem 'rake', '~> 11.2', '>= 11.2.2'
 
 group :production do
   gem "puma"
