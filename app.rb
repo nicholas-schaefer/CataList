@@ -6,6 +6,7 @@ require "bcrypt"
 require_relative 'database_persistence'
 require_relative 'f_system'
 require_relative 'user'
+require_relative 'form_input'
 
 configure do
   set :erb, :escape_html => true
@@ -20,6 +21,7 @@ configure(:development) do
   also_reload "database_persistence.rb"
   also_reload "f_system.rb"
   also_reload "user.rb"
+  also_reload "form_input.rb"
 end
 
 helpers do
@@ -31,14 +33,15 @@ helpers do
 end
 
 before do
+  # Persistent Storage
   @storage ||= DatabasePersistence.new(logger: logger)
   @f_system ||= Fsystem.new()
+  @form_input ||= FormInput.new()
   session[:user] ||= User.new()
   @user = session[:user]
+  session[:previous_path] ||= []
 
-  @app_name = "CataList".freeze
-  PAGINATION_ITEM_LIMIT = 10
-
+  # Transient Storage
   @request_errors = []
   @add_contact_form = {
     first_name: "John",
@@ -54,10 +57,9 @@ before do
   @contacts_successfully_seeded = false
   @count_contacts_successfully_seeded = nil
 
-
-  # session[:user_is_authenticated] ||= false
-  # session[:user_name] ||= nil
-  session[:previous_path] ||= []
+  # Constants
+  @app_name = "CataList".freeze
+  PAGINATION_ITEM_LIMIT = 10
 
   handle_authentication
 end
@@ -73,66 +75,10 @@ def handle_authentication
   end
 end
 
-# def logged_in?
-#   session[:user_is_authenticated]
-# end
-
-# def load_user_credentials
-#   credentials_path = File.expand_path("../users.yaml", __FILE__)
-#   YAML.load_file(credentials_path)
-# end
-
-# def credentials_correct?(username_input:, password_input:)
-#   credentials = load_user_credentials
-
-#   return false unless credentials.key?(username_input)
-#   valid_username = username_input
-
-#   bcrypt_password = BCrypt::Password.new(credentials[valid_username])
-#   bcrypt_password == password_input
-# end
-
-# def log_in
-#   session[:user_is_authenticated] = true
-# end
-
-# def log_out
-#   session[:user_is_authenticated] = false
-#   session[:user_name] = nil
-# end
 
 #######################################
 # Sanitization
 #######################################
-
-def sanitize_field_first_name(input)
-  input.strip.downcase
-end
-
-def sanitize_field_last_name(input)
-  input.strip.downcase
-end
-
-def sanitize_field_phone_number(input)
-  input.strip
-end
-
-def sanitize_field_email(input)
-  input.strip
-end
-
-def sanitize_field_note(input)
-  input.strip
-end
-
-def acceptable_image_type?(file_type)
-  case file_type
-  when 'image/jpeg' then 'jpg'
-  when 'image/png' then 'png'
-  else
-    false
-  end
-end
 
 ## Methods in spired by https://stackoverflow.com/a/47511286 ## MAKE THIS PRIVATE
 def valid_uuid_format?(uuid)
@@ -264,11 +210,11 @@ end
 
 # Add a new contact
 post '/contacts' do
-  first_name = sanitize_field_first_name(params['first_name'])
-  last_name = sanitize_field_last_name(params['last_name'])
-  phone_number = sanitize_field_phone_number(params['phone_number'])
-  email = sanitize_field_email(params['email'])
-  note = sanitize_field_note(params['note'])
+  first_name = @form_input.sanitize_field_first_name(params['first_name'])
+  last_name = @form_input.sanitize_field_last_name(params['last_name'])
+  phone_number = @form_input.sanitize_field_phone_number(params['phone_number'])
+  email = @form_input.sanitize_field_email(params['email'])
+  note = @form_input.sanitize_field_note(params['note'])
 
   handle_contact_text_creation(
     first_name: first_name,
@@ -373,11 +319,11 @@ post '/contacts/:contact_id' do
 
   image_upload_failed_abort_required = (newly_created_profile_image_id == false)
   unless image_upload_failed_abort_required
-    first_name = sanitize_field_first_name(params['first_name'])
-    last_name = sanitize_field_last_name(params['last_name'])
-    phone_number = sanitize_field_phone_number(params['phone_number'])
-    email = sanitize_field_email(params['email'])
-    note = sanitize_field_note(params['note'])
+    first_name = @form_input.sanitize_field_first_name(params['first_name'])
+    last_name = @form_input.sanitize_field_last_name(params['last_name'])
+    phone_number = @form_input.sanitize_field_phone_number(params['phone_number'])
+    email = @form_input.sanitize_field_email(params['email'])
+    note = @form_input.sanitize_field_note(params['note'])
 
     handle_contact_text_update(
       contact_id: id,
@@ -419,7 +365,7 @@ def contact_exists?(contact_id)
 end
 
 def handle_image_upload(profile_pic:, picture_file_type:, contact_id:)
-  picture_file_extension = acceptable_image_type?(picture_file_type)
+  picture_file_extension = @form_input.acceptable_image_type?(picture_file_type)
   if picture_file_extension == false
     @request_errors << "Invalid filetype, png, or jpg required"
     false
