@@ -66,6 +66,7 @@ end
 
 #######################################
 # Authentication
+#   additional methods in `User` class
 #######################################
 
 def handle_authentication
@@ -78,9 +79,10 @@ end
 
 #######################################
 # Sanitization
+#   additional methods in `FormInput` class
 #######################################
 
-## Methods in spired by https://stackoverflow.com/a/47511286 ## MAKE THIS PRIVATE
+## Method inspired by https://stackoverflow.com/a/47511286
 def valid_uuid_format?(uuid)
   uuid_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   return true if uuid_regex.match?(uuid.to_s.downcase)
@@ -88,9 +90,9 @@ def valid_uuid_format?(uuid)
 end
 
 
-
 #######################################
 # Pages
+#   every page in the app
 #######################################
 
 def load_account_management_page
@@ -157,7 +159,6 @@ def load_page_not_found
 end
 
 
-
 #######################################
 # Routes
 #######################################
@@ -210,18 +211,13 @@ end
 
 # Add a new contact
 post '/contacts' do
-  first_name = @form_input.sanitize_field_first_name(params['first_name'])
-  last_name = @form_input.sanitize_field_last_name(params['last_name'])
-  phone_number = @form_input.sanitize_field_phone_number(params['phone_number'])
-  email = @form_input.sanitize_field_email(params['email'])
-  note = @form_input.sanitize_field_note(params['note'])
 
   handle_contact_text_creation(
-    first_name: first_name,
-    last_name: last_name,
-    phone_number: phone_number,
-    email: email,
-    note: note)
+    first_name: params['first_name'],
+    last_name: params['last_name'],
+    phone_number: params['phone_number'],
+    email: params['email'],
+    note: params['note'])
 
   if @request_errors.empty?
     profile_pic = params['profile_pic']
@@ -327,11 +323,11 @@ post '/contacts/:contact_id' do
 
     handle_contact_text_update(
       contact_id: id,
-      first_name: first_name,
-      last_name: last_name,
-      phone_number: phone_number,
-      email: email,
-      note: note)
+      first_name: params['first_name'],
+      last_name: params['last_name'],
+      phone_number: params['phone_number'],
+      email: params['email'],
+      note: params['note'])
 
     if @contact_successfully_edited == false
       @storage.delete_image(profile_image_id: newly_created_profile_image_id)
@@ -390,6 +386,11 @@ def handle_image_upload(profile_pic:, picture_file_type:, contact_id:)
 end
 
 def handle_contact_text_creation(first_name:, last_name:, phone_number:, email:, note:)
+  first_name = @form_input.sanitize_field_first_name(first_name)
+  last_name = @form_input.sanitize_field_last_name(last_name)
+  phone_number = @form_input.sanitize_field_phone_number(phone_number)
+  email = @form_input.sanitize_field_email(email)
+  note = @form_input.sanitize_field_note(note)
   begin
     res = @storage.add_contact(
             first_name: first_name,
@@ -417,6 +418,11 @@ def handle_contact_text_creation(first_name:, last_name:, phone_number:, email:,
 end
 
 def handle_contact_text_update(contact_id:, first_name:, last_name:, phone_number:, email:, note:)
+  first_name = @form_input.sanitize_field_first_name(first_name)
+  last_name = @form_input.sanitize_field_last_name(last_name)
+  phone_number = @form_input.sanitize_field_phone_number(phone_number)
+  email = @form_input.sanitize_field_email(email)
+  note = @form_input.sanitize_field_note(note)
   begin
     res = @storage.edit_contact(
             id: contact_id,
