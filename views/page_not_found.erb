@@ -2,7 +2,14 @@
     <header>
         <h2>Page Not Found</h2>
     </header>
-    <article>
-      <p>Sorry, page not found</p>
-    </article>
+    <section class="errors">
+      <section class="<%= @request_errors.empty? ? 'hidden' : '' %>">
+        <h2>Database errors:</h2>
+      <% @request_errors.each do |error_message| %>
+      <p><%= error_message %></p>
+      <% end %>
+      <br>
+      </section>
+      <p>Go to <a href="/contacts">Contacts Homepage</a></p>
+    </section>
 </section>

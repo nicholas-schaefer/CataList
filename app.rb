@@ -104,7 +104,11 @@ end
 
 def load_contact_page
   param_contact_id = params['contact_id']
-  halt 404 unless contact_exists?(param_contact_id )
+
+  if !contact_exists?(param_contact_id)
+    @request_errors << "No contact exists at that path"
+    halt 404
+  end
 
   @contact = @storage.find_contact(id: param_contact_id).first
 
@@ -133,8 +137,11 @@ def load_all_contacts_page
   @pages = (1..total_pages).to_a
 
   pagination_requested = params['page'] || '1'
-  halt 404 unless string_also_an_integer?(pagination_requested)
-  halt 404 unless @pages.any?(pagination_requested.to_i)
+
+  unless string_also_an_integer?(pagination_requested) && @pages.any?(pagination_requested.to_i)
+    @request_errors << "Given page number is not in range"
+    halt 404
+  end
 
   @validated_pagination_int = pagination_requested.to_i
   pagination_offset = (@validated_pagination_int - 1) * PAGINATION_ITEM_LIMIT
@@ -183,7 +190,11 @@ end
 
 get '/images/profiles/:profile_pic_id' do
   profile_pic_path = File.join(@f_system.data_images_profiles_path, params['profile_pic_id'])
-  halt 404 unless File.exist?(profile_pic_path)
+
+  if !File.exist?(profile_pic_path)
+    @request_errors << "profile image not found at that path"
+    halt 404
+  end
 
   send_file(profile_pic_path)
 end
