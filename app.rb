@@ -1,3 +1,6 @@
+require 'bundler/setup'
+require "ostruct"
+
 require 'sinatra'
 require 'pg'
 require "yaml"
@@ -58,7 +61,7 @@ before do
 
   # Constants
   @app_name = "CataList".freeze
-  PAGINATION_ITEM_LIMIT = 10
+  @pagination_item_limit = 10
 
   # Methods
   handle_authentication
@@ -132,7 +135,7 @@ def load_all_contacts_page
   if total_contacts_count.zero?
     total_pages = 1
   else
-    total_pages = ((total_contacts_count-1)/(PAGINATION_ITEM_LIMIT)) + 1
+    total_pages = ((total_contacts_count-1)/(@pagination_item_limit)) + 1
   end
   @pages = (1..total_pages).to_a
 
@@ -144,9 +147,9 @@ def load_all_contacts_page
   end
 
   @validated_pagination_int = pagination_requested.to_i
-  pagination_offset = (@validated_pagination_int - 1) * PAGINATION_ITEM_LIMIT
+  pagination_offset = (@validated_pagination_int - 1) * @pagination_item_limit
 
-  @contacts = @storage.find_selected_contacts(limit: PAGINATION_ITEM_LIMIT, offset:pagination_offset)
+  @contacts = @storage.find_selected_contacts(limit: @pagination_item_limit, offset:pagination_offset)
   @page_title_tag = page_title_tag(title:"home")
 
   erb :index, :layout => :layout

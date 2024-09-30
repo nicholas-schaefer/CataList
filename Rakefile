@@ -14,11 +14,6 @@ task :create_db_with_schema do
   Rake::Task['create_schema'].invoke
 end
 
-desc 'Drop Database'
-task :drop_db do
-  sh 'dropdb katalist;'
-end
-
 desc 'Run App'
 task :app do
   sh 'ruby app.rb'
