@@ -32,6 +32,7 @@
                 <h2>Contact successfully updated.</h2>
                 <p>UPDATING LIKE A BOSS!!!</p>
                 <label for="edit_contact" roll="link">Exit editor</label>
+                <p>Or continue editing this contact below</p>
             </section>
             <section class="<%= @request_errors.empty? ? 'errors hidden' : 'errors' %>">
                 <h2>Database errors:</h2>
@@ -40,6 +41,7 @@
             <% end %>
             </section>
             <form roll="edit-form" method="post" enctype="multipart/form-data">
+                <h2>Edit this Contact</h2>
                 <dl>
                     <input type="hidden" id="contact_id" name="contact_id" value="<%=@contact["id"]%>">
 
