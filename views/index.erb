@@ -11,12 +11,7 @@
             <button disabled><img src="/images/search-icon.png" alt="search"></button>
         </form>
     </header>
-    <section class="<%= @newly_added_contact_id.empty? ? 'success hidden' : 'success' %>">
-        <h2>Contact successfully created!</h2>
-        <p>You are so Popular!</p>
-        <a href="<%= @path_info + "/" + @newly_added_contact_id %>">View Newest Contact</a>
-    </section>
-        <section class="<%= @contact_successfully_deleted ? 'success' : 'success hidden' %>">
+    <section class="<%= @contact_successfully_deleted ? 'success' : 'success hidden' %>">
         <h2>Contact successfully deleted!</h2>
         <p>You are losing friendos!</p>
     </section>
@@ -65,16 +60,22 @@
         </form>
     </section>
 
-    <input type="checkbox" id="edit_contact" class="hidden" <%= @request_errors.empty? ? '' : 'checked' %>>
+    <input type="checkbox" id="edit_contact" class="hidden" <%= @request_errors.empty? && !@edit_param_present ? '' : 'checked' %>>
     <section class="modal">
         <article roll="edit-form-wrapper">
+            <section class="<%= @newly_added_contact_id.empty? ? 'success hidden' : 'success' %>">
+                <h2>Contact successfully created!</h2>
+                <p>You are so Popular!</p>
+                <a href="<%= @path_info + "/" + @newly_added_contact_id %>">View your Added Contact</a>
+                <p>Or add another contact below</p>
+            </section>
             <section class="<%= @request_errors.empty? ? 'errors hidden' : 'errors' %>">
                 <h2>Database errors:</h2>
                 <% @request_errors.each do |error_message| %>
                     <p><%= error_message %></p>
                 <% end %>
             </section>
-            <form roll="edit-form" method="post" name="add-contact" action="/contacts" enctype="multipart/form-data">
+            <form roll="edit-form" method="post" name="add-contact" action="/contacts?edit=true" enctype="multipart/form-data">
                 <dl>
                     <dt><label for="profile_pic">Update profile picture:</label></dt>
                     <dd><input type="file" id="profile_pic" name="profile_pic" accept="image/png, image/jpeg"

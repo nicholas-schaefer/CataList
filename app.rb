@@ -124,6 +124,9 @@ def load_contact_page
   @delete_action = "#{@path_info}/delete"
   @page_title_tag = page_title_tag(title:"contact")
 
+  @edit_param_present = !!request.params["edit"]
+  # binding.pry
+
   erb :contact, :layout => :layout
 end
 
@@ -151,6 +154,8 @@ def load_all_contacts_page
 
   @contacts = @storage.find_selected_contacts(limit: @pagination_item_limit, offset:pagination_offset)
   @page_title_tag = page_title_tag(title:"home")
+
+  @edit_param_present = !!request.params["edit"]
 
   erb :index, :layout => :layout
 end

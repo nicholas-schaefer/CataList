@@ -8,10 +8,6 @@
         </nav>
         <h2><%= full_name(first_name: @contact["first_name"], last_name: @contact["last_name"])%></h2>
     </header>
-    <section class="<%= @contact_successfully_edited ? 'success' : 'success hidden' %>">
-        <h2>Contact successfully updated.</h2>
-            <p>UPDATING LIKE A BOSS!!!</p>
-    </section>
     <article>
         <img class="profile-image" src=<%= @contact["image_file_path"] %> alt="profile image">
         <dl>
@@ -29,9 +25,14 @@
             <% end%>
         </dl>
     </article>
-    <input type="checkbox" id=edit_contact class="hidden" <%= @request_errors.empty? ? '' : 'checked' %>>
+    <input type="checkbox" id="edit_contact" class="hidden" <%= @request_errors.empty? && !@edit_param_present ? '' : 'checked' %>>
     <section class="modal">
         <article roll="edit-form-wrapper">
+            <section class="<%= @contact_successfully_edited ? 'success' : 'success hidden' %>">
+                <h2>Contact successfully updated.</h2>
+                <p>UPDATING LIKE A BOSS!!!</p>
+                <label for="edit_contact" roll="link">Exit editor</label>
+            </section>
             <section class="<%= @request_errors.empty? ? 'errors hidden' : 'errors' %>">
                 <h2>Database errors:</h2>
                 <% @request_errors.each do |error_message| %>
