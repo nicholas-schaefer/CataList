@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     const checkbox = document.getElementById('edit_contact');
 
+    if (checkbox == null ){
+        return
+    }
+
     checkbox.addEventListener('change', function() {
         const url = new URL(window.location);
 
