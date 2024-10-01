@@ -74,7 +74,7 @@ end
 
 def handle_authentication
   if (@user.logged_in? == false) && !(request.path_info == "/account")
-    session[:previous_path][0] = request.path_info
+    session[:previous_path][0] = request.fullpath
     redirect '/account'
   end
 end
