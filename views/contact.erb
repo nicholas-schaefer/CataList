@@ -49,6 +49,32 @@
                     <dd><input type="file" id="profile_pic" name="profile_pic" accept="image/png, image/jpeg"
                             size="2097152"></dd>
 
+                    <h4>previously upload images</h4>
+                    <ul>
+                        <% @contact_profile_images&.each_with_index do |tuple, idx|%>
+                            <% if tuple["file_name"].nil? %>
+                            <li>No previously uploaded images - default quizzical cat image displayed</li>
+                            <% else%>
+                            <li>
+                                <a href="/images/profiles/<%= tuple["file_name"] %>">
+                                    image_<%= idx + 1%>
+                                </a>
+                                <%= tuple["created_at"]%>
+                                    <% if idx == 0 %>
+                                        <span class= "current-profile">Current Profile</span>
+                                    <% else%>
+                                        <button formaction="<%= params['contact_id'] %>/make_featured_image/<%= tuple['profile_image_id'] %>">make current</button>
+                                    <% end %>
+                                        <button formaction="<%= params['contact_id'] %>/delete_profile_pic/<%= tuple['profile_image_id'] %>">delete this image</button>
+                            </li>
+                            <% end %>
+                        <% end %>
+                        <br>
+                        <% unless @contact_profile_images %>
+                            <li>No older profiles pic available</li>
+                        <% end %>
+                    </ul>
+
                     <dt><label for="first_name">first name</label></dt>
                     <dd><input type="text" maxlength="250" id="first_name" name="first_name" value="<%=@contact["first_name"]%>"></dd>
 

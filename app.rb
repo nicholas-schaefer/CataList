@@ -114,6 +114,8 @@ def load_contact_page
   end
 
   @contact = @storage.find_contact(id: param_contact_id).first
+  @contact_profile_images = @storage.find_contact_profile_pics(id: param_contact_id)
+  # binding.pry
 
   file_to_load = @contact["file_name"] ? @contact["file_name"] : "_no_profile_default/no-image-found-placeholder.jpg"
   @contact["image_file_path"] = File.join("/images/profiles", file_to_load)
@@ -125,7 +127,6 @@ def load_contact_page
   @page_title_tag = page_title_tag(title:"contact")
 
   @edit_param_present = !!request.params["edit"]
-  # binding.pry
 
   erb :contact, :layout => :layout
 end
@@ -296,6 +297,50 @@ get '/contacts/:contact_id/delete' do
   redirect to('/contacts')
 end
 
+# Delete a profile image
+post '/contacts/:contact_id/delete_profile_pic/:profile_image_id' do
+  # erb "<p>this worked</p>"
+  id = params['contact_id']
+  profile_image_id = params['profile_image_id']
+  # binding.pry
+  begin
+    raise("contact not found") unless contact_exists?(id)
+    raise("image not found") unless profile_pic_exists?(profile_image_id)
+
+    res = @storage.delete_image(profile_image_id: profile_image_id)
+  rescue StandardError => e
+    @request_errors << "image deletion failed."
+  else
+  end
+
+  redirect "/contacts/#{id}?edit=true"
+  # load_contact_page
+end
+
+
+# Update profile image's last modified time
+post '/contacts/:contact_id/make_featured_image/:profile_image_id' do
+  # erb "<p>this worked</p>"
+  id = params['contact_id']
+  profile_image_id = params['profile_image_id']
+  # binding.pry
+  begin
+    raise("contact not found") unless contact_exists?(id)
+    raise("image not found") unless profile_pic_exists?(profile_image_id)
+    # binding.pry
+
+    res = @storage.edit_image_last_modified_time(profile_image_id: profile_image_id)
+  rescue StandardError => e
+    @request_errors << "image order change failed"
+    # erb "<p>fail</p>"
+    load_contact_page
+  else
+  end
+  redirect "/contacts/#{id}?edit=true"
+
+  # load_contact_page
+end
+
 # Update contact details
 # inspiration: https://gist.github.com/runemadsen/3905593 and https://stackoverflow.com/questions/2686044/file-upload-with-sinatra
 post '/contacts/:contact_id' do
@@ -443,6 +488,10 @@ end
 
 def contact_exists?(contact_id)
   valid_uuid_format?(contact_id) && @storage.find_contact(id: contact_id).ntuples == 1
+end
+
+def profile_pic_exists?(profile_pic_id)
+  valid_uuid_format?(profile_pic_id) && @storage.find_profile_pic(pic_id: profile_pic_id).ntuples == 1
 end
 
 def page_title_tag(title:"", delimiter:"-", app_name:@app_name)

@@ -129,6 +129,10 @@ dd {
     margin-top: 15px;
 }
 
+.current-profile {
+    background-color: gold;
+}
+
 button {
     min-width: 30px;
     cursor: var(--link-cursor);

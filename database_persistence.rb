@@ -56,6 +56,16 @@ class DatabasePersistence
     query(sql, profile_image_id)
   end
 
+  def edit_image_last_modified_time(profile_image_id:)
+    sql = <<~SQL
+    UPDATE profile_images
+    SET created_at = timezone('utc', now())
+    WHERE profile_image_id = $1
+    SQL
+    query(sql, profile_image_id)
+  end
+
+
   def add_contact(first_name:, last_name:, phone_number:, email:, note: )
     sql = <<~SQL
     INSERT INTO contacts(first_name, last_name, phone, email, note)
@@ -108,6 +118,28 @@ class DatabasePersistence
     WHERE c.id = $1
     ORDER BY pi.created_at DESC
     LIMIT 1;
+    SQL
+    query(sql, id)
+  end
+
+  def find_profile_pic(pic_id:)
+    sql = <<~SQL
+    SELECT * from profile_images
+    WHERE profile_image_id = $1
+    SQL
+
+    query(sql, pic_id)
+  end
+
+
+
+  def find_contact_profile_pics(id:)
+    sql = <<~SQL
+    SELECT pi.file_name, pi.created_at, pi.profile_image_id
+    FROM contacts AS c
+    LEFT JOIN profile_images AS pi ON c.id = pi.contact_id
+    WHERE c.id = $1
+    ORDER BY pi.created_at DESC
     SQL
     query(sql, id)
   end
