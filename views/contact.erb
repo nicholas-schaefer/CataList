@@ -49,7 +49,7 @@
                     <dd><input type="file" id="profile_pic" name="profile_pic" accept="image/png, image/jpeg"
                             size="2097152"></dd>
 
-                    <h4>previously upload images</h4>
+                    <h4>previously uploaded images</h4>
                     <ul>
                         <% @contact_profile_images&.each_with_index do |tuple, idx|%>
                             <% if tuple["file_name"].nil? %>

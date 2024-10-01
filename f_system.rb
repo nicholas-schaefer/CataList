@@ -13,6 +13,12 @@ class Fsystem
     end
   end
 
+  def delete_file_system_image(image_basename:)
+    fpath = File.join(data_images_profiles_path, image_basename)
+    File.delete(fpath)
+  end
+
+
   private
   def get_all_file_system_image_names
     dir = data_images_profiles_path

@@ -307,11 +307,16 @@ post '/contacts/:contact_id/delete_profile_pic/:profile_image_id' do
     raise("contact not found") unless contact_exists?(id)
     raise("image not found") unless profile_pic_exists?(profile_image_id)
 
+    profile_pic_details = @storage.find_profile_pic(pic_id: profile_image_id)
+    profile_image_file_name = profile_pic_details.first['file_name']
+
     res = @storage.delete_image(profile_image_id: profile_image_id)
   rescue StandardError => e
     @request_errors << "image deletion failed."
   else
   end
+
+  @f_system.delete_file_system_image(image_basename: profile_image_file_name)
 
   redirect "/contacts/#{id}?edit=true"
   # load_contact_page
