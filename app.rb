@@ -115,7 +115,6 @@ def load_contact_page
 
   @contact = @storage.find_contact(id: param_contact_id).first
   @contact_profile_images = @storage.find_contact_profile_pics(id: param_contact_id)
-  # binding.pry
 
   file_to_load = @contact["file_name"] ? @contact["file_name"] : "_no_profile_default/no-image-found-placeholder.jpg"
   @contact["image_file_path"] = File.join("/images/profiles", file_to_load)
@@ -284,7 +283,13 @@ post '/contacts/:contact_id/delete' do
   id = params['contact_id']
   begin
     raise("contact not found") unless contact_exists?(id)
+    contact_profile_images = @storage.find_contact_profile_pics(id: id)
     res = @storage.delete_contact(id: id)
+
+    contact_profile_images.each do |tuple|
+      deletion_response = @f_system.delete_file_system_image(image_basename: tuple["file_name"])
+    end
+
   rescue StandardError => e
     @request_errors << "contact deletion failed. contact may have already been deleted."
   else

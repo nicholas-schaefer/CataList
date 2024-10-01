@@ -7,11 +7,7 @@ This was modelled after the add contacts feature on an iphone. It could have sim
 
 The initial app design involved the inclusion of a search feature. However, upon reflection I concluded that such a feature would be more beneficial if it did not require a page load. Since this project assessment does not ask us to use javascript, I decided not to pursue that feature at this time. (Instead of deleting the input box, I simply disabled it, hyping it as an upcoming feature!).
 
-This application is only designed to work with one user. Were I to add multiple user functionality, a significant rewrite of the app logic would be required, especially as it relates to handling the uploading and deleting of profile images to the file system.
-
-The current system is incomplete, as image's are never deleted when newer profile pictures are added (with the exception of the "delete all" option.) Were the app to proceed with only ever requiring one user be logged in, then the simplest solution would be the programming of a "cleanup cron" to periodically delete older images.
-
-On the other hand, were the app to proceed to requiring multiple user logins, much bigger changes would be required. Instead of loading all profile images to one folder, I would programmatically create folders, named by their contact id's, that would hold only profile images for that specific contact.
+This application is only designed to work with one user.
 
 ## Browser Compatibility
 This app was tested in Firefox version `130.0.1 (64-bit)`
