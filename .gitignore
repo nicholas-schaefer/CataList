@@ -1,5 +1,6 @@
 # Ignore everything in the profiles folder
-data/images/profiles/
+data/images/profiles/*
 
-# Except for the _no_profile_default folder
-!data/images/profiles/_no_profile_default
+# Except for the _no_profile_default folder and its contents
+!data/images/profiles/_no_profile_default/
+!data/images/profiles/_no_profile_default/**
