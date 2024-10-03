@@ -1,6 +1,6 @@
 # CataList
 
-An contacts manage app for keeping track of your favorite feline (or human) contacts.
+A contacts management app for keeping track of your favorite feline (or human) contacts.
 
 ![cat contact page](public/images/documentation/view-contact-page.png)
 
