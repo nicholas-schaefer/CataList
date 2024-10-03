@@ -2,6 +2,8 @@
 
 An contacts manage app for keeping track of your favorite feline (or human) contacts.
 
+![cat contact page](public/images/documentation/view-contact-page.png)
+
 ## Design Choices
 This was modelled after the add contacts feature on an iphone. It could have simply been a contact app for humans, however cats are cuter, so CataList is an app cats can use to keep their feline friends on speed dial (This is why the default image provided when no image is provided is that of a quizzical cat!)
 
@@ -62,11 +64,21 @@ Rake is simply automating the running of a series of shell commands. If for what
 ### Login
 Credentials are written in plain text on the login page.
 
+![login page](public/images/documentation/account-login-page.png)
+
 ### Optional Step - Seed database
 After successful login you will be redirected to the homepage. On this homepage there is a button labelled "Seed Database." Upon clicking this, you will be have a number dummy data added to the contacts database.
 
+![homepage](public/images/documentation/homepage-seed-success.png)
+
 ### Create, Read, Update, or Delete Contacts
 CRUD options are available via various web forms within the app.
+
+![contact updated page](public/images/documentation/contact-updated-page.png)
+
+### Upload and reuse old profile pics
+
+![contact updated page](public/images/documentation/edit-this-contact-image-page.png)
 
 ## Data Cleanup
 
