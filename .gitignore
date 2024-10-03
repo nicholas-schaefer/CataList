@@ -1,0 +1,5 @@
+# Ignore everything in the profiles folder
+data/images/profiles/
+
+# Except for the _no_profile_default folder
+!data/images/profiles/_no_profile_default
