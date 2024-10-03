@@ -1,6 +1,6 @@
 # interactions with the database
 class DatabasePersistence
-  def initialize(dbname: "katalist", logger:)
+  def initialize(dbname: "catalist", logger:)
     @db = PG.connect(dbname: dbname)
     @logger = logger
   end

@@ -1,26 +1,24 @@
-# Katalist
+# CataList
 
-An app for keeping track of your cat contacts.
+An contacts manage app for keeping track of your favorite feline (or human) contacts.
 
 ## Design Choices
-This was modelled after the add contacts feature on an iphone. It could have simply been a contact app for humans, however cats are cuter, so KataList is an app cats can use to keep their feline friends on speed dial (This is why the default image provided when no image is provided is that of a quizzical cat!)
+This was modelled after the add contacts feature on an iphone. It could have simply been a contact app for humans, however cats are cuter, so CataList is an app cats can use to keep their feline friends on speed dial (This is why the default image provided when no image is provided is that of a quizzical cat!)
 
-The initial app design involved the inclusion of a search feature. However, upon reflection I concluded that such a feature would be more beneficial if it did not require a page load. Since this project assessment does not ask us to use javascript, I decided not to pursue that feature at this time. (Instead of deleting the input box, I simply disabled it, hyping it as an upcoming feature!).
-
-This application is only designed to work with one user.
+This application is currently only designed to work with one user, credentials are hard coded on the login page.
 
 ## Browser Compatibility
 This app was tested in Firefox version `130.0.1 (64-bit)`
 
 ## Tech Stack Overview
-- Ruby is used for the code
+- Ruby is used for the backend code
 - Bundler, for dependency management
 - PostgreSQL, for an RDBMS
-- Command Line for running your app
+- Rake, for running tasks that could also be run via command line
 
 Configuration details provided in subsequent section.
 
-## Install, Configure, & Run Katalist
+## Install, Configure, & Run CataList
 
 ### Instal PostgreSQL
 __PostgreSQL must be installed__ on your system in order for this app to run. PostgreSQL is a powerful, open source object-relational database system. Testing was successfully competed using version `14.13`, (specifically psql (PostgreSQL) 14.13 (Ubuntu 14.13-0ubuntu0.22.04.1)). While other versions may work, it is recommended that at least this version be installed on your system.
@@ -55,19 +53,26 @@ Run the following command in the command line (Project directory)
 Run the following command in the command line (Project directory)
 - `bundle exec rake app`
 
-If this runs successfully, the command line will indicate the local url where you can interact with the app.
+If this runs successfully, the command line will indicate the local url where you can interact with the app via the browser.
 
 #### Troubleshooting - What to do if bundler doesn't work
-Rake is simply automating the running of a series of shell commands. If for whatever reason you are unable to get rake to run, try running the commands manually in the shell. Commands are located in the file entitled`Rakefile`.
+Rake is simply automating the running of a series of shell commands. If for whatever reason you are unable to get rake to run, try running the commands manually in the shell. Commands are located in the file entitled `Rakefile`.
 
 ## Getting Started
 ### Login
-Credentials are written in plain text on the login page
+Credentials are written in plain text on the login page.
 
 ### Optional Step - Seed database
-After successful login you will be redirected to the homepage. On this homepage there is a button labelled "Seed Database." Upon clicking this, you will be have a number dummy data added to the contacts database
+After successful login you will be redirected to the homepage. On this homepage there is a button labelled "Seed Database." Upon clicking this, you will be have a number dummy data added to the contacts database.
 
 ### Create, Read, Update, or Delete Contacts
 CRUD options are available via various web forms within the app.
 
-### Have Fun!
+## Data Cleanup
+
+Step 1. From within the app, click the "delete all contacts" button. This will
+- delete all rows from both tables
+- delete all added images from the filesystem
+
+Step 2. From the command line, run the following rake command in order to drop the CataList database from postgreSQL
+- `bundle exec rake drop_database`

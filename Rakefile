@@ -1,11 +1,11 @@
 desc 'Create empty database'
 task :create_db do
-  sh 'createdb katalist'
+  sh 'createdb catalist'
 end
 
 desc 'Add schema to Database'
 task :create_schema do
-  sh 'psql -d katalist < schema.sql;'
+  sh 'psql -d catalist < schema.sql;'
 end
 
 desc 'Create Database with Schema'
@@ -21,3 +21,8 @@ end
 
 desc 'Just do this!'
 task :default => [:app]
+
+desc 'Drop the Database once finished'
+task :drop_database do
+  sh 'dropdb catalist'
+end
